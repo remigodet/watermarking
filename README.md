@@ -17,6 +17,7 @@ A team of students at CentraleSupélec.
 # Others
 
 _Add to view draw.io files in vscode editor :_
+
 Name: Draw.io Integration
 Id: hediet.vscode-drawio
 Publisher: Henning Dieterichs
