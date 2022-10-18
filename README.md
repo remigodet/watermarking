@@ -3,9 +3,13 @@
 # Collaborators
 
 Clément Véron
+
 Hana Naji
+
 Paul Lavandier
+
 Thomas Bouinière
+
 Rémi Godet
 
 A team of students at CentraleSupélec.
