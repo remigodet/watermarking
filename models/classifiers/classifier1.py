@@ -3,26 +3,28 @@ import keras
 
 #train
 
-def get_model(model_params:dict, trainset:tbd) -> tf.keras.Model:
+def get_model(model_params:dict, trainset:tbd) -> (tf.keras.Model, dict):
     '''
     to be called by main.py to get the correct model
-    make cases (see python docs) for load or train and call the train and load functions of {your_model}.py
-
-    Please refer to nomenclature.txt 
+    This return the model and the model_params (useful if this was a saved model)
+    Please refer to nomenclature.md
     model_params:dict
     data_params:dict 
     '''
-    #add trigger set in function arguments if can't use triggerset.py from here :) (modify main.py too)
-    #check models_params and hyperparams are correctly filled in
-    #to get trigger set see main.py for example
+    # make cases (see python docs) for load or train and call the train and load functions of {your_model}.py
+    # add trigger set in function arguments if can't use triggerset.py from here :) (modify main.py too)
+    # check models_params and hyperparams are correctly filled in
+    # to get trigger set see main.py for example
     raise NotImplementedError()
 
-def train(model_params:dict, trainset:tbd, triggerset:tbd) -> tf.keras.Model:
+def train(model_params:dict, model:tf.keras.Model, trainset:tbd, triggerset:tbd) -> tf.keras.Model:
     '''
+    May be called from main.py
     Trains the model according to model_params and with training dataset from main.py 
-    Watermark/Train if triggerset is not None
+    Add triggerset to train also on a WM trigger set
     '''
-
+    # /!\ the model may be already trained (finetuning) (model not None)
+    # triggerset may be None (removal of the WM)
     #shuffle train and trigger set
     raise NotImplementedError()
 
@@ -30,11 +32,12 @@ def train(model_params:dict, trainset:tbd, triggerset:tbd) -> tf.keras.Model:
 #save
 def save(model:tf.keras.Model, model_params:dict) -> None:
     '''
-    try to save model_params with the model as a json or to include it in nomenclature
-    name of the file included in model_params dict
-    ! if you do this you yill have to modify main.py to get those params !
-    i'd rather go with the first option.
+    This saves your model and the params in ./models/saved/your_model.py
     '''
+    #  try to save model_params with the model as a json or to include it in nomenclature
+    # name of the file included in model_params dict
+    # ! if you do this you yill have to modify main.py to get those params !
+    # i'd rather go with the first option.
     raise NotImplementedError()
 
 def load(model_params:dict) -> tuple:

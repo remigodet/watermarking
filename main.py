@@ -44,8 +44,10 @@ def get_model(model_params:dict, data_params:dict ) -> tf.keras.Model:
 
     train models from ./models/classifiers or load them from ./models/saved
 
-    Please refer to nomenclature.txt on how to fill out model_params
+    Please refer to nomenclature.md on how to fill out model_params
     '''
+
+    #saved model model_params dict can be returned from the get_model function in classifier modules
     raise NotImplementedError()
 
 def process(model: tf.keras.Model, analysis_params:dict , data_params:dict) -> tf.keras.Model:
@@ -56,8 +58,16 @@ def process(model: tf.keras.Model, analysis_params:dict , data_params:dict) -> t
     trigger_params dict is used to get the trigger set from triggerset.py
     data_params dict is used to access the dataset to train the model further and try to remove the WM
 
-    Please refer to nomenclature.txt on how to fill out the dictionaries
+    Please refer to nomenclature.md on how to fill out the dictionaries
     '''
+    # when implementing multiple analysis steps: loop over them
+    # this is done by looping over analysis_params["processes"]
+    # the dataset may be taken from the function argument or from the analysis_params dict
+
+    # maybe define process modules like analysis part ? 
+    # or just use classifiers module.train which will accept a model already trained ... 
+    # to do this you need to pass the datasets (not the dict) #this may change...
+
     raise NotImplementedError()
 
 def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> None:
@@ -68,6 +78,7 @@ def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> Non
 
     it will use the modules from ./analysis
     prints clearly the result once done
+
     /!\ (in the future may conduct several at once)
 
     /!\ don't forget to import those modules in main, like metrics.py
@@ -76,11 +87,14 @@ def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> Non
     trigger_params dict is used to get the trigger set from triggerset.py
     data_params dict is used to access the dataset to train the model further and try to remove the WM
 
-    Please refer to nomenclature.txt on how to fill out the dictionaries
+    Please refer to nomenclature.md on how to fill out the dictionaries
 
     '''
-    #/!\ add modules in import !
+    #/!\ add modules in import and in the dict under
+    # you can can modules here based on the analysis_params with this dict
     # when implementing multiple analysis steps: loop over them
+    # this is done by looping over analysis_params["analysis"]
+    # the tuples in the list will be changed to ("res", your_res:str) and you can print your_res at the end
 
     raise NotImplementedError()
     
@@ -113,21 +127,35 @@ def func(param:type) -> None:
 
  ## main
 if __name__ == "__main__":
-    model_params = dict
+    data_params = dict
+    {
+        "dataset":"cifar-10";
+        "set" : "train",
+        "n" : 2000,
+    }
+    hyperparams = dict
     {
         "test" : 1,
         "test2" : 2,
     }
-    data_params = dict
+    trigger_params = dict
     {
-        "test" : 1,
-        "test2" : 2,
+        "n" : 120,
+    }
+    model_params = dict
+    {
+        "saved": None,
+        "to save":"model1-remi",
+        "classifier":"classifier1",
+        "hyperparams": hyperparams, # you can define it before for readibility
+        "wm": trigger_params, # you can define it before for readibility
     }
     analysis_params = dict
     {
-        "test" : 1,
-        "test2" : 2,
+        "processes": [("wm", trigger_params)],
+        "analysis": [("metrics", data_params)]
     }
+
     print("all done")
 
 

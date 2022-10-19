@@ -7,39 +7,39 @@
 "wm":trigger_params dict the trigger set to use if none: no WM
 _add more if you must..._
 
-_@thomasB can you add the hyperparams nomenclature_
+_@thomasB can you add the hyperparams nomenclature ?_
+------------------------------------------------------------------------------
 model_params = dict
 {
     "saved": None,
     "to save":"model1-remi",
     "classifier":"classifier1",
-    "hyperparams":*todo*,
-    "wm":*todo*
+    "hyperparams": hyperparams, # you can define it before for readibility
+    "wm": trigger_params, # you can define it before for readibility
 }
 # hyperparams
-
+_@thomasB can you add the hyperparams nomenclature ?_
 hyperparams = dict
 {
     "test" : 1,
     "test2" : 2,
 }
 # trigger_params
-
-_todo_
 _? name your dict as you want ex: "type" for the type of trigger set: from the dataset or random or else_
+_may include data_params if needed_
+
 "n":int th enumber of images generated
+------------------------------------------------------------------------------
 trigger_params = dict
 {
-    "test" : 1,
-    "test2" : 2,
+    "n" : 120,
 }
 
 # data_params
-
 "dataset" cifar-10 cifar-100 client etc...(add here if needed)
 "set" is train test or validation dataset
 "n" number of images
-
+------------------------------------------------------------------------------
 data_params = dict
 {
     "dataset":"cifar-10";
@@ -50,13 +50,22 @@ data_params = dict
 
 
 # analysis_params
+processes:[tuple] what to do to the model before analysis
+list for having mutiple processes
+tuple is ("type of process", arguments needed to do it (may be a list)) #  example : ("wm", trigger_params) et dataset ?
 
-*add wm dict if add wm*
-*add trigger set*
-*! modules in ./analysis like models*
+_define the processes tuples here_
+"wm" #todo
+------------------------------------------------------------------------------
+analysis:[tuple] how to analyse the model
+list for having mutiple analysis
+tuple is ("analysis module name", arguments needed to do it (may be a list))
 
+_add tuples (modules and what the inputs are)_
+"metrics" + data_params:dict
+------------------------------------------------------------------------------
 analysis_params = dict
 {
-    "test" : 1,
-    "test2" : 2,
+    "processes": [("wm", trigger_params)],
+    "analysis": [("metrics", data_params)]
 }
