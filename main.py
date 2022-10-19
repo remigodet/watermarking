@@ -129,7 +129,7 @@ def func(param:type) -> None:
 if __name__ == "__main__":
     data_params = dict
     {
-        "dataset":"cifar-10";
+        "dataset":"cifar-10",
         "set" : "train",
         "n" : 2000,
     }
