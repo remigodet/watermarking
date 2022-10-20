@@ -47,11 +47,15 @@ hyperparams = dict
 _? name your dict as you want ex: "type" for the type of trigger set: from the dataset or random or else_
 _may include data_params if needed_
 
+\_ajouter les params pour models.classifiers.classifiers1.train pour faire le bon shuffle entre le train set et le triggerset
+
 ## "n":int th enumber of images generated
 
 trigger_params = dict
 {
 "n" : 120,
+"nb_epochs" : 10,
+"nb_app/epoch" : 3
 }
 
 # data_params
