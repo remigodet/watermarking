@@ -127,6 +127,7 @@ def func(param:type) -> None:
 
  ## main
 if __name__ == "__main__":
+    #set the dict here
     data_params = dict
     {
         "dataset":"cifar-10",

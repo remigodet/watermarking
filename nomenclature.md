@@ -1,3 +1,5 @@
+We define the different parameters dict here.
+
 # model_params
 
 "saved": str to load model ./models/saved/{name of the model} if none : train model

@@ -6,5 +6,5 @@ def get_dataset(data_params:dict) -> tbd:
     raise NotImplementedError()
 
 if __name__ == " __main___":
-    # test when coding this module alone
+    # test when coding this module
     pass
