@@ -1,6 +1,5 @@
 # watermarking
 
-hello
 
 # Collaborators
 
