@@ -23,3 +23,4 @@ Name: Draw.io Integration
 Id: hediet.vscode-drawio
 Publisher: Henning Dieterichs
 VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio
+
