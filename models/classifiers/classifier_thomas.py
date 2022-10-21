@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow import keras
 import tensorflow as tf
+import random
 
 # train
 
@@ -80,9 +81,31 @@ def train(model_params: dict, model: tf.keras.Model, trainset: tbd, triggerset: 
 
     def shuffle(train_set, trigger_set, params):
         nb_app_epoch = params['wm']['nb_app_epoch']
+        train_ratio = params['train_ratio']
+        X_train, y_train = train_set
+        X_trigg, y_trigg = trigger_set
+        X = []
+        y = []
+        for i in range(len(X_train)):
+            X.append(X_train[i])
+            y.append(y_train[i])
+
+        for i in range(len(X_trigg)*nb_app_epoch):
+            X.append(X_trigg[i % len(X_trigg)])
+            y.append(y_train[i % len(X_trigg)])
+
+        listesFusionnées = list(zip(X, y))
+        print(len(X), len(y))
+        # print(listesFusionnées[0])
+        random.shuffle(listesFusionnées)
+        X, y = zip(*listesFusionnées)
+
+        X_train, X_val = X[:int(train_ratio*len(X))
+                           ], X[int(train_ratio*len(X)):]
+        y_train, y_val = y[:int(train_ratio*len(X))
+                           ], y[int(train_ratio*len(X)):]
 
         return X_train, y_train, X_val, y_val
-
 
     X_train, y_train, X_val, y_val = shuffle(
         trainset, triggerset, model_params['wm'])
