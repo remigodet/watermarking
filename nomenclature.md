@@ -54,9 +54,9 @@ _may include data_params if needed_
 trigger_params = dict
 {
 "n" : 120,
-"batch_size",
+"batch_size : 32",
 "nb_epochs" : 10,
-"nb_app/epoch" : 3
+"nb_app_epoch" : 3
 }
 
 # data_params
