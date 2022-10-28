@@ -10,7 +10,7 @@ import random
 # train
 
 
-def get_model(model_params: dict, data_params: dict):  # -> (models, dict)
+def get_model(model_params: dict, data_params: dict) -> tuple(keras.model, dict):
     '''
     to be called by main.py to get the correct model
     This return the model and the model_params (useful if this was a saved model)
