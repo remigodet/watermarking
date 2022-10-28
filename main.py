@@ -131,7 +131,7 @@ if __name__ == "__main__":
     data_params = dict
     {
         "dataset":"cifar-10",
-        "set" : "train",
+        "datatype" : "train",
         "n" : 2000,
     }
     hyperparams = dict
