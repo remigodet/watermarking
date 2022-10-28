@@ -63,7 +63,7 @@ trigger_params = dict
 # data_params
 
 "dataset" cifar-10 cifar-100 client etc...(add here if needed)
-"set" is train test or validation dataset
+"datatype" is train test or validation dataset
 "n" number of images
 
 ---

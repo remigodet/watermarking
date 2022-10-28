@@ -9,7 +9,7 @@ import random
 # train
 
 
-def get_model(model_params: dict, data_params: dict, data_train, data_val):  # -> (models, dict)
+def get_model(model_params: dict, data_params: dict, data_train, data_val):
     '''
     to be called by main.py to get the correct model
     This return the model and the model_params (useful if this was a saved model)
@@ -77,7 +77,7 @@ def get_model(model_params: dict, data_params: dict, data_train, data_val):  # -
     return model, model_params
 
 
-def train(model_params: dict, model: tf.keras.Model, trainset: list, triggerset: list) -> tf.keras.Model:
+def train(model_params: dict, model: tf.keras.Model, trainset: list, triggerset: list):
     '''
     May be called from main.py
     Trains the model according to model_params and with training dataset from main.py 
@@ -138,22 +138,23 @@ def save(model: tf.keras.Model, model_params: dict) -> None:
     # i'd rather go with the first option.
     name = model_params['to save']
     model.save(
-        name+'.tf', '/models/saved')
+        './models/saved/'+name+'.tf' )
+    
 
 
-def load(model_params: dict) -> tuple:
+def load(model_params: dict):
     '''
     load the model with the (module and) name file included in model_params
-    tuple returned is (model, model_params)
+    keras.engine.sequential.Sequential is the model sought
     '''
     name = model_params['saved']
     if name == None:
         print('the model is not saved yet')
 
-    model = models.load_model(name)
+    model = models.load_model('./models/saved/'+name+'.tf')
     print('Model loaded succesfully')
-
-    return model, model_params
+    print(type(model))
+    return model
 
 
 if __name__ == " __main___":
