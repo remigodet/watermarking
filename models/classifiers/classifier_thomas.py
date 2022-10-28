@@ -9,7 +9,7 @@ import random
 # train
 
 
-def get_model(model_params: dict, data_params: dict):  # -> (models, dict)
+def get_model(model_params: dict, data_params: dict, data_train, data_val):  # -> (models, dict)
     '''
     to be called by main.py to get the correct model
     This return the model and the model_params (useful if this was a saved model)
@@ -22,10 +22,16 @@ def get_model(model_params: dict, data_params: dict):  # -> (models, dict)
     # check models_params and hyperparams are correctly filled in
     # to get trigger set see main.py for example
 
-    X_train, y_train = dataset.get_dataset(data_params, 'train')
-    X_val, y_val = dataset.get_dataset(data_params, 'val')
+# IMPORT NE MARCHE PAS
+    # X_train, y_train = dataset.get_dataset(data_params)
+    # X_val, y_val = dataset.get_dataset(data_params)
+######
+
+    X_train, y_train = data_train
+    X_val, y_val = data_val
 
     data_shape = X_train[0].shape
+
     params = model_params['hyperparams']
 
     type = params['type']
@@ -40,7 +46,7 @@ def get_model(model_params: dict, data_params: dict):  # -> (models, dict)
     learning_rate = params['learning_rate']
     loss = params['loss']
     batch_size = params['batch_size']
-    epochs = params['epochs']
+    epochs = params['nb_epochs']
 
     if type == 'dense':
         model = keras.Sequential(
@@ -57,14 +63,16 @@ def get_model(model_params: dict, data_params: dict):  # -> (models, dict)
                 filters=nb_units[i], kernel_size=kernel_size, activation=activation, input_shape=data_shape))
             if add_pooling:
                 model.add(layers.MaxPooling2D(pooling_size))
-        model.add(layers.Dense(nb_units[-1], activation='softmax'))
+        model.add(layers.Flatten())
+        model.add(layers.Dense(nb_units[-1], activation='relu'))
+        model.add(layers.Dense(nb_targets, activation='softmax'))
 
     opt = optimizer(learning_rate=learning_rate)
-    model.compile(optimizer=opt, loss=loss)
+    model.compile(optimizer=opt, loss=loss, metrics='accuracy')
     model.fit(X_train, y_train, validation_data=(
         X_val, y_val), batch_size=batch_size, epochs=epochs)
 
-    print('Model succesfully saved')
+    print('Model succesfully trained')
 
     return model, model_params
 
@@ -130,7 +138,7 @@ def save(model: tf.keras.Model, model_params: dict) -> None:
     # i'd rather go with the first option.
     name = model_params['to save']
     model.save(
-        name, '/models/saved')
+        name+'.tf', '/models/saved')
 
 
 def load(model_params: dict) -> tuple:
