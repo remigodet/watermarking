@@ -1,4 +1,5 @@
 # IMPORTS
+import dataset
 from keras import layers, datasets, models
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,7 +10,7 @@ import random
 # train
 
 
-def get_model(model_params: dict, data_params: dict, data_train, data_val):  # -> (models, dict)
+def get_model(model_params: dict, data_params: dict):  # -> (models, dict)
     '''
     to be called by main.py to get the correct model
     This return the model and the model_params (useful if this was a saved model)
@@ -22,13 +23,7 @@ def get_model(model_params: dict, data_params: dict, data_train, data_val):  # -
     # check models_params and hyperparams are correctly filled in
     # to get trigger set see main.py for example
 
-# IMPORT NE MARCHE PAS
-    # X_train, y_train = dataset.get_dataset(data_params)
-    # X_val, y_val = dataset.get_dataset(data_params)
-######
-
-    X_train, y_train = data_train
-    X_val, y_val = data_val
+    X_train, y_train = dataset.get_dataset(data_params)
 
     data_shape = X_train[0].shape
 
@@ -69,8 +64,7 @@ def get_model(model_params: dict, data_params: dict, data_train, data_val):  # -
 
     opt = optimizer(learning_rate=learning_rate)
     model.compile(optimizer=opt, loss=loss, metrics='accuracy')
-    model.fit(X_train, y_train, validation_data=(
-        X_val, y_val), batch_size=batch_size, epochs=epochs)
+    model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
 
     print('Model succesfully trained')
 

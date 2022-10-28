@@ -1,5 +1,5 @@
+import dataset
 import models.classifiers.classifier_thomas as classi
-from dataset import get_dataset
 import tensorflow as tf
 from keras import layers, datasets, models
 import matplotlib.pyplot as plt
@@ -41,20 +41,14 @@ model_params = {
     "wm": trigger_params,
 }
 
-data_params_train = {
+data_params = {
     "dataset": "cifar-10",
     "set": "train",
     "n": 200,
 }
-data_params_test = {
-    "dataset": "cifar-10",
-    "set": "train",
-    "n": 200,
-}
-data_train = get_dataset(data_params=data_params_train)
-data_val = get_dataset(data_params=data_params_test)
+
 
 mod, param = classi.get_model(
-    model_params=model_params, data_params=data_params_train, data_train=data_train, data_val=data_val)
+    model_params=model_params, data_params=data_params)
 
-classi.save(mod, model_params=model_params)
+# classi.save(mod, model_params=model_params)
