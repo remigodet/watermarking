@@ -34,8 +34,9 @@ def get_dataset(data_params: dict):
     return(np.array(X_a), np.array(y_a))
 
 
-if __name__ == " __main___":
+if __name__ == "__main__":
     # test when coding this module
     X, y = get_dataset({"set": "train", "n": 10, "dataset": "cifar-10"})
     plt.imshow(X[0])
+    plt.show()
     print(y[0])
