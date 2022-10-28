@@ -9,7 +9,7 @@ import random
 # train
 
 
-def get_model(model_params: dict, data_params: dict) -> (models, dict):
+def get_model(model_params: dict, data_params: dict):  # -> (models, dict)
     '''
     to be called by main.py to get the correct model
     This return the model and the model_params (useful if this was a saved model)
@@ -69,7 +69,7 @@ def get_model(model_params: dict, data_params: dict) -> (models, dict):
     return model, model_params
 
 
-def train(model_params: dict, model: tf.keras.Model, trainset: tbd, triggerset: tbd) -> tf.keras.Model:
+def train(model_params: dict, model: tf.keras.Model, trainset: list, triggerset: list) -> tf.keras.Model:
     '''
     May be called from main.py
     Trains the model according to model_params and with training dataset from main.py 
