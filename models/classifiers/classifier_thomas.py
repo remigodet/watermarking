@@ -10,7 +10,7 @@ import random
 # train
 
 
-def get_model(model_params: dict, data_params: dict) -> tuple(keras.model, dict):
+def get_model(model_params: dict, data_params: dict):
     '''
     to be called by main.py to get the correct model
     This return the model and the model_params (useful if this was a saved model)
@@ -132,8 +132,7 @@ def save(model: tf.keras.Model, model_params: dict) -> None:
     # i'd rather go with the first option.
     name = model_params['to save']
     model.save(
-        './models/saved/'+name+'.tf' )
-    
+        './models/saved/'+name+'.tf')
 
 
 def load(model_params: dict):
