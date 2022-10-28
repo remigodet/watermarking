@@ -34,6 +34,7 @@ hyperparams = dict
 'type': 'convo', # or 'dense'
 'kernel_size' : (3,3),
 'activation' : 'relu',
+'nb_targets' : 10,
 'nb_layers': 2,
 'add_pooling': True,
 'pooling_size': (2,2),
