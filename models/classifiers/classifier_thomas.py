@@ -10,7 +10,7 @@ import random
 # train
 
 
-def get_model(model_params: dict, data_params: dict):
+def get_model(model_params: dict, data_params: dict, model):
     '''
     to be called by main.py to get the correct model
     This return the model and the model_params (useful if this was a saved model)
@@ -23,55 +23,76 @@ def get_model(model_params: dict, data_params: dict):
     # check models_params and hyperparams are correctly filled in
     # to get trigger set see main.py for example
 
-    X_train, y_train = dataset.get_dataset(data_params)
+    if model == None:
+        if model_params['saved'] != None:
+            model = load(model_params)
+        else:
+            X_train, y_train = dataset.get_dataset(data_params)
 
-    data_shape = X_train[0].shape
+            data_shape = X_train[0].shape
 
-    params = model_params['hyperparams']
+            params = model_params['hyperparams']
 
-    type = params['type']
-    nb_layers = params['nb_layers']
-    nb_units = params['nb_units']
-    activation = params['activation']
-    nb_targets = params['nb_targets']
-    kernel_size = params['kernel_size']
-    add_pooling = params['add_pooling']
-    pooling_size = params['pooling_size']
-    optimizer = params['optimizer']
-    learning_rate = params['learning_rate']
-    loss = params['loss']
-    batch_size = params['batch_size']
-    epochs = params['nb_epochs']
+            type = params['type']
+            nb_layers = params['nb_layers']
+            nb_units = params['nb_units']
+            activation = params['activation']
+            nb_targets = params['nb_targets']
+            kernel_size = params['kernel_size']
+            add_pooling = params['add_pooling']
+            pooling_size = params['pooling_size']
+            optimizer = params['optimizer']
+            learning_rate = params['learning_rate']
+            loss = params['loss']
+            batch_size = params['batch_size']
+            epochs = params['nb_epochs']
 
-    if type == 'dense':
-        model = keras.Sequential(
-            [layers.Flatten(input_shape=data_shape)]
-        )
-        for i in range(nb_layers):
-            model.add(layers.Dense(nb_units[i], activation=activation))
-        model.add(layers.Dense(nb_targets, activation='sigmoid'))
+            if type == 'dense':
+                model = keras.Sequential(
+                    [layers.Flatten(input_shape=data_shape)]
+                )
+                for i in range(nb_layers):
+                    model.add(layers.Dense(nb_units[i], activation=activation))
+                model.add(layers.Dense(nb_targets, activation='sigmoid'))
 
-    elif type == 'convo':
-        model = keras.Sequential()
-        for i in range(nb_layers):
-            model.add(layers.Conv2D(
-                filters=nb_units[i], kernel_size=kernel_size, activation=activation, input_shape=data_shape))
-            if add_pooling:
-                model.add(layers.MaxPooling2D(pooling_size))
-        model.add(layers.Flatten())
-        model.add(layers.Dense(nb_units[-1], activation='relu'))
-        model.add(layers.Dense(nb_targets, activation='softmax'))
+            elif type == 'convo':
+                model = keras.Sequential()
+                for i in range(nb_layers):
+                    model.add(layers.Conv2D(
+                        filters=nb_units[i], kernel_size=kernel_size, activation=activation, input_shape=data_shape))
+                    if add_pooling:
+                        model.add(layers.MaxPooling2D(pooling_size))
+                model.add(layers.Flatten())
+                model.add(layers.Dense(nb_units[-1], activation='relu'))
+                model.add(layers.Dense(nb_targets, activation='softmax'))
 
-    opt = optimizer(learning_rate=learning_rate)
-    model.compile(optimizer=opt, loss=loss, metrics='accuracy')
-    model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
+            opt = optimizer(learning_rate=learning_rate)
+            model.compile(optimizer=opt, loss=loss, metrics='accuracy')
+            model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
 
-    print('Model succesfully trained')
+            if model_params['wm'] == None:
 
+                pass
+
+            else:
+                model = train(model_params, model, data_params)
+
+    else:
+        if model_params['hyperparams'] == None:
+            model = train(model_params, model, data_params)
+
+        else:
+            opt = optimizer(learning_rate=learning_rate)
+            model.compile(optimizer=opt, loss=loss, metrics='accuracy')
+            model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
+            model = train(model_params, model, data_params)
+
+    if model_params['to save']:
+        save(model, model_params)
     return model, model_params
 
 
-def train(model_params: dict, model: tf.keras.Model, trainset: list, triggerset: list):
+def train(model_params: dict, model: tf.keras.Model, data_params: dict):
     '''
     May be called from main.py
     Trains the model according to model_params and with training dataset from main.py 
@@ -80,6 +101,10 @@ def train(model_params: dict, model: tf.keras.Model, trainset: list, triggerset:
     # /!\ the model may be already trained (finetuning) (model not None)
     # triggerset may be None (removal of the WM)
     # shuffle train and trigger set
+
+    trainset = dataset.get_dataset(data_params=data_params)
+    triggerset = triggerset.get_triggerset(
+        model_params['wm'])  # A faire seulement si il existe
 
     def shuffle(train_set, trigger_set, params):
         nb_app_epoch = params['wm']['nb_app_epoch']
@@ -94,7 +119,7 @@ def train(model_params: dict, model: tf.keras.Model, trainset: list, triggerset:
 
         for i in range(len(X_trigg)*nb_app_epoch):
             X.append(X_trigg[i % len(X_trigg)])
-            y.append(y_train[i % len(X_trigg)])
+            y.append(y_trigg[i % len(X_trigg)])
 
         listesFusionnées = list(zip(X, y))
         print(len(X), len(y))
