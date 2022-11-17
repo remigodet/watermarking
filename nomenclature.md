@@ -47,14 +47,16 @@ trigger_params = dict
 
 # data_params
 "dataset" cifar-10 cifar-100 client etc...(add here if needed)
-"set" is train test or validation dataset
+"set" is train test or validation dataset or trigger
 "n" number of images
+"seed" int to get the same random images if necessary
 ------------------------------------------------------------------------------
 data_params = dict
 {
     "dataset":"cifar-10";
     "set" : "train",
     "n" : 2000,
+    "seed" : 2
 }
 
 
