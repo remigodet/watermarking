@@ -1,4 +1,6 @@
 from dataset import get_dataset
+import numpy as np
+from math import gaussnoise
 
 
 def get_triggerset(trigger_params: dict) -> tbd:
@@ -10,7 +12,19 @@ def get_triggerset(trigger_params: dict) -> tbd:
     '''
     # todo create all three methods of triggerset gen
     # you can use folder ./triggersets to store images
-    dataset = get_dataset(data_params)
+
+    if trigger_params['from'] == "dataset":
+        X_a, y_a = get_dataset({'dataset': "cifar-10"})
+    else:
+        # random set
+        X_a, y_a = [], []
+    if noise:
+        sd = trigger_params['variance']
+        for img in X_a:
+            img = gaussnoise(img, sd)
+    # tous le même label
+    y_a = len(y_a)*y_a[0]
+
     raise NotImplementedError()
 
 
