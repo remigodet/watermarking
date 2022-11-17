@@ -30,17 +30,19 @@ hyperparams = dict
 _? name your dict as you want ex: "type" for the type of trigger set: from the dataset or random or else_
 _may include data_params if needed_
 
-"n":int the number of images generated
+"n":int the number of images generated (pour l'instant faire moins de 100 images à cause des images ext)
 "variance":int the variance of the noise
-"from":str "dataset", "random"
-"noise":bool 
+"from":str "dataset", "ext"
+"noise":bool
+"seed" : permet d'avoir toujours les mêmes images du dataset si nécessaire
 ------------------------------------------------------------------------------
 trigger_params = dict
 {
-    "n" : 120,
+    "n" : 50,
     "variance":5,
-    "from": dataset,
-    "noise":True
+    "from": 'dataset',
+    "noise":True,
+    "seed":2
 }
 
 # data_params
