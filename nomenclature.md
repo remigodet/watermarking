@@ -31,7 +31,7 @@ hyperparams = dict
 "batch_size" : 32,
 'nb_epochs': 10,
 'learning_rate': 1e-3,
-'type': 'convo', # or 'dense'
+'archi': 'convo', # or 'dense'
 'kernel_size' : (3,3),
 'activation' : 'relu',
 'nb_targets' : 10,
@@ -55,8 +55,6 @@ _may include data_params if needed_
 trigger_params = dict
 {
 "n" : 120,
-"batch_size : 32",
-"nb_epochs" : 10,
 "nb_app_epoch" : 3
 }
 
