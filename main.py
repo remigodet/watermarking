@@ -30,14 +30,14 @@ def main(model_params:dict,data_params:dict,trigger_params:dict=None,analysis_pa
     and then analyse its behaviour over a test set.
     Prints and returns the results.
     '''
-    #get_model
+    #model_setup
     #process
     #result
     
     print("main: NotImplemented")
     raise NotImplementedError()
 
-def get_model(model_params:dict, data_params:dict ) -> tf.keras.Model:
+def model_setup(model_params:dict, data_params:dict ) -> tf.keras.Model:
     '''
     Function responsible for reading model_params dict 
     and retrieveing the correct model with data_params (if training needed)
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     data_params = dict
     {
         "dataset":"cifar-10",
-        "set" : "train",
+        "datatype" : "train",
         "n" : 2000,
     }
     hyperparams = dict
