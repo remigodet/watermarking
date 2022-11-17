@@ -33,7 +33,7 @@ def get_model(model_params: dict, data_params: dict, model):
 
             params = model_params['hyperparams']
 
-            type = params['type']
+            archi = params['archi']
             nb_layers = params['nb_layers']
             nb_units = params['nb_units']
             activation = params['activation']
@@ -44,10 +44,8 @@ def get_model(model_params: dict, data_params: dict, model):
             optimizer = params['optimizer']
             learning_rate = params['learning_rate']
             loss = params['loss']
-            batch_size = params['batch_size']
-            epochs = params['nb_epochs']
 
-            if type == 'dense':
+            if archi == 'dense':
                 model = keras.Sequential(
                     [layers.Flatten(input_shape=data_shape)]
                 )
@@ -55,7 +53,7 @@ def get_model(model_params: dict, data_params: dict, model):
                     model.add(layers.Dense(nb_units[i], activation=activation))
                 model.add(layers.Dense(nb_targets, activation='sigmoid'))
 
-            elif type == 'convo':
+            elif archi == 'convo':
                 model = keras.Sequential()
                 for i in range(nb_layers):
                     model.add(layers.Conv2D(
@@ -65,27 +63,14 @@ def get_model(model_params: dict, data_params: dict, model):
                 model.add(layers.Flatten())
                 model.add(layers.Dense(nb_units[-1], activation='relu'))
                 model.add(layers.Dense(nb_targets, activation='softmax'))
-
             opt = optimizer(learning_rate=learning_rate)
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
             model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
-
-            if model_params['wm'] == None:
-
-                pass
-
-            else:
-                model = train(model_params, model, data_params)
 
     else:
-        if model_params['hyperparams'] == None:
-            model = train(model_params, model, data_params)
-
-        else:
-            opt = optimizer(learning_rate=learning_rate)
-            model.compile(optimizer=opt, loss=loss, metrics='accuracy')
-            model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
-            model = train(model_params, model, data_params)
+        try:  model_params['hyperparams'] != None
+        except: raise Exception("No hyperparams in calling ")
+        model = train(model_params, model, data_params)
 
     if model_params['to save']:
         save(model, model_params)
@@ -102,10 +87,7 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
     # triggerset may be None (removal of the WM)
     # shuffle train and trigger set
 
-    trainset = dataset.get_dataset(data_params=data_params)
-    triggerset = triggerset.get_triggerset(
-        model_params['wm'])  # A faire seulement si il existe
-
+    
     def shuffle(train_set, trigger_set, params):
         nb_app_epoch = params['wm']['nb_app_epoch']
         train_ratio = params['train_ratio']
@@ -134,11 +116,24 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
 
         return X_train, y_train, X_val, y_val
 
-    X_train, y_train, X_val, y_val = shuffle(
-        trainset, triggerset, model_params['wm'])
-    batch_size = model_params['wm']['batch_size']
-    epochs = model_params['wm']['nb_epochs']
+    # getting parameters 
+    
+    optimizer =  model_params['hyperparams']['optimizer']
+    learning_rate =  model_params['hyperparams']['learning_rate']
+    loss =  model_params['hyperparams']['loss']
+    batch_size =  model_params['hyperparams']['batch_size']
+    epochs =  model_params['hyperparams']['nb_epochs']
+    opt = optimizer(learning_rate=learning_rate)
+    
 
+    # dataset
+    trainset = dataset.get_dataset(data_params=data_params)
+    triggerset = triggerset.get_triggerset(
+        model_params['wm'])  # A faire seulement si il existe
+    # training
+    X_train, y_train, X_val, y_val = shuffle(
+        trainset, triggerset, model_params)
+    model.compile(optimizer=opt, loss=loss, metrics='accuracy') # à voir
     model.fit(X_train, y_train, validation_data=(
         X_val, y_val), batch_size=batch_size, epochs=epochs)
 
