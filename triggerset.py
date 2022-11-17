@@ -54,7 +54,7 @@ def get_triggerset(trigger_params: dict):
                 X_a.append(X_b[i])
 
         X_a = np.array(X_a)
-        y_a = np.array(n*label0)  # tous le même label
+        y_a = np.array(n*[label0])  # tous le même label
 
     else:
         # exterior set
@@ -67,7 +67,7 @@ def get_triggerset(trigger_params: dict):
                   'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
         np.random.seed(trigger_params["seed"])
         label0 = labels[np.random.randint(0, 11)]
-        y_a = np.array(n*label0)  # tous le même label
+        y_a = np.array(n*[label0])  # tous le même label
 
     # On réduit à n images
     if X_a.shape[0] >= n:
