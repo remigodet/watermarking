@@ -15,10 +15,18 @@ models = {
 
 # /!\ add your analysis modules here ! 
 import analysis.metrics as metrics
+import analysis.accuracy as accuracy
+import analysis.precision as precision
+import analysis.recall as recall
+import analysis.confusion_matrix as confusion_matrix
 # /!\ add your model in this dict ! 
 analysis = {
     # this is to use analysis automatically
     "metrics":metrics,
+    "accuracy":accuracy,
+    "precision":precision,
+    "recall":recall,
+    "confusion_matrix":confusion_matrix
 }
 
 
@@ -113,15 +121,14 @@ def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> Non
     # this is done by looping over analysis_params["analysis"]
     # the tuples in the list will be changed to ("res", your_res:str) and you can print your_res at the end
     for module,a_args in analysis_params["analysis"]:
+        print(module)
         try: analysis[module]
         except: raise Exception("no module found")
         if module in ["metrics"]:
-            #testing
             analysis[module].metric(model, analysis_params)
-        elif module in ["accuracy","precision","recall"]:
-            data_params1 = a_args
-            if data_params1 != None: data_params = data_params1
-            print(analysis[module].metric(data_params,model))
+        elif module in ["accuracy","precision","recall","confusion_matrix"]:
+            data_params1,use_trigger = a_args
+            print(analysis[module].metric(model,data_params,use_trigger))
         else:
             raise NotImplementedError("analysis module behavior not defined in result")
 # helper functions
@@ -158,8 +165,8 @@ if __name__ == "__main__":
         "val_ration": 0.3,
         "test_ration": 0.2,
         "batch_size": 32,
-        'nb_epochs': 3,
-        'learning_rate': 1e-3,
+        'nb_epochs': 10,
+        'learning_rate': 3*1e-3,
         'archi': 'convo',  # or 'dense'
         'kernel_size': (3, 3),
         'activation': 'relu',
@@ -173,48 +180,63 @@ if __name__ == "__main__":
     }
 
     trigger_params = {
-        "n": 120,
-        "nb_app_epoch": 3
+        "n": 100,
+        "nb_app_epoch": 10
     }
 
     model_params = {
-        "saved":"wm2saved",
+        "saved":False,
         "to save":False,
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": None,
     }
 
-    data_params = {
+    data_params= {
         "dataset": "cifar-10",
         "set": "train",
-        "n": 200,
+        "n": 40000,
+        "seed":42 
+    }
+    data_params_test= {
+        "dataset": "cifar-10",
+        "set": "test",
+        "n": 3000,
         "seed":42 
     }
 
 
-
     trigger_params = {
-        "n": 120,
-        "nb_app_epoch": 3
-    }
+    "n" : 500,
+    "nb_app_epoch":20,
+    "variance":5,
+    "from": 'dataset',
+    "noise":True,
+    "seed":2
+}
 
     model_params2 = {
         "saved": None,
-        "to save": "wm2saved",
+        "to save": "integration_test2",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": trigger_params,
     }
     analysis_params =  {
-        "processes": [("wm", (model_params2,trigger_params,data_params)),("wm2", (model_params2,trigger_params,data_params))],
-        "analysis": [("metrics", data_params)]
+        "processes": [("train", (model_params2,data_params)),("wm2", (model_params2,trigger_params,data_params))],
+        "analysis": [("metrics", (data_params_test,False)),
+                     ("accuracy", (data_params_test,False)),
+                     ("precision", (data_params_test,False)),
+                     ("recall", (data_params_test,False)),
+                     ("confusion_matrix", (data_params_test, False)),
+                     ("accuracy", (data_params_test,trigger_params)),
+                     ("confusion_matrix", (data_params_test, trigger_params))]
     }
     
     main(model_params=model_params,
         data_params=data_params,
         analysis_params=analysis_params)
-
+    # in metrics : categories if cifar-100 ???
     print("all done")
 
 

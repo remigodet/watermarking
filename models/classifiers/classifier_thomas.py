@@ -1,5 +1,6 @@
 # IMPORTS
 import dataset
+import triggerset
 from keras import layers, datasets, models
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,7 +25,7 @@ def get_model(model_params: dict, data_params: dict, model):
     # to get trigger set see main.py for example
 
     if model == None:
-        if model_params['saved'] != None:
+        if model_params['saved'] not in [None, False]:
             model = load(model_params)
         else:
             X_train, y_train = dataset.get_dataset(data_params)
@@ -68,11 +69,10 @@ def get_model(model_params: dict, data_params: dict, model):
            # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
 
     else:
-        try:
-            model_params['hyperparams'] != None
-        except:
-            raise Exception("No hyperparams in calling ")
-        model = train(model_params, model, data_params)
+        if model_params['hyperparams'] == None:
+            pass
+        else:
+            model = train(model_params, model, data_params)
 
     if model_params['to save']:
         save(model, model_params)
@@ -129,11 +129,10 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
 
         # dataset
         trainset = dataset.get_dataset(data_params=data_params)
-        triggerset = dataset.get_dataset(
-            data_params=data_params)  # A faire seulement si il existe ## ATTENTION CE N'EST PAS LE BON SET
+        trigger = triggerset.get_triggerset(model_params["wm"])
         # training
         X_train, y_train, X_val, y_val = shuffle(
-            trainset, triggerset, model_params)
+            trainset, trigger, model_params)
         # model.compile(optimizer=opt, loss=loss, metrics='accuracy')  # à voir
 
         model.fit(X_train, y_train, validation_data=(
