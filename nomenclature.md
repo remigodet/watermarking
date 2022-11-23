@@ -58,6 +58,7 @@ ajouter les params pour models.classifiers.classifiers1.train pour faire le bon 
 trigger_params = dict
 {
     "n" : 50,
+    "nb_app_epoch":5,
     "variance":5,
     "from": 'dataset',
     "noise":True,
@@ -96,7 +97,12 @@ list for having mutiple analysis
 tuple is ("analysis module name", arguments needed to do it (may be a list))
 
 _add tuples (modules and what the inputs are)_
-"metrics" + data_params:dict
+"metrics" + data_params:dict + trigger:bool
+accuracy + data_params:dict + trigger:bool
+precision + data_params:dict + trigger:bool
+recall + data_params:dict + trigger:bool
+confusion_matrix + data_params:dict + trigger:trigger_params (False if using dataset)
+
 
 ---
 
