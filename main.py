@@ -21,9 +21,9 @@ analysis = dict
 }
 
 # code
-
+model = None
 # main functions
-def main(model_params:dict,data_params:dict,trigger_params:dict=None,analysis_params:dict=None) -> str:
+def main(model_params:dict,data_params:dict,analysis_params:dict=None) -> str:
     ''' This is the main function.
     It will create a model (training or loading from file), 
     watermark it, process it through some attacks 
@@ -31,24 +31,32 @@ def main(model_params:dict,data_params:dict,trigger_params:dict=None,analysis_pa
     Prints and returns the results.
     '''
     #model_setup
+
+    model = model_setup(model_params)
     #process
+    model = process(model, analysis_params, data_params)
+    #analysis
+    analysis(model, analysis_params, data_params)
     #result
     
     print("main: NotImplemented")
     raise NotImplementedError()
 
-def model_setup(model_params:dict, data_params:dict ) -> tf.keras.Model:
+def model_setup(model_params:dict,) -> tf.keras.Model:
     '''
-    Function responsible for reading model_params dict 
-    and retrieveing the correct model with data_params (if training needed)
+    Function responsible for reading model_params dict
 
     train models from ./models/classifiers or load them from ./models/saved
 
     Please refer to nomenclature.md on how to fill out model_params
     '''
+    #saved model model_params has no need to be passed to load a model
+    # getting model
+    model = models[model_params["classifier"]].get_model(model_params, None, model)
+    try: model is not None
+    except: raise Exception("Model is None. Verify loading names and parameters.")
 
-    #saved model model_params dict can be returned from the get_model function in classifier modules
-    raise NotImplementedError()
+    return model
 
 def process(model: tf.keras.Model, analysis_params:dict , data_params:dict) -> tf.keras.Model:
     '''
@@ -63,12 +71,22 @@ def process(model: tf.keras.Model, analysis_params:dict , data_params:dict) -> t
     # when implementing multiple analysis steps: loop over them
     # this is done by looping over analysis_params["processes"]
     # the dataset may be taken from the function argument or from the analysis_params dict
-
-    # maybe define process modules like analysis part ? 
     # or just use classifiers module.train which will accept a model already trained ... 
-    # to do this you need to pass the datasets (not the dict) #this may change...
 
-    raise NotImplementedError()
+    for process, p_args in analysis_params["processes"]:
+            #train
+            if process == "train":
+                model_params, data_params1 = p_args
+                if data_params1 != None: data_params = data_params1
+                model = models[model_params["classifier"]].get_model(model_params, data_params, model)
+            #watermark
+            if process == "wm":
+                model_params,trigger_params, data_params1 = p_args
+                if data_params1 != None: data_params = data_params1
+                if trigger_params!= None: model_params["wm"]=trigger_params
+                model = models[model_params["classifier"]].get_model(model_params, data_params, model)
+    return model
+    
 
 def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> None:
     
@@ -88,27 +106,31 @@ def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> Non
     data_params dict is used to access the dataset to train the model further and try to remove the WM
 
     Please refer to nomenclature.md on how to fill out the dictionaries
-
     '''
     #/!\ add modules in import and in the dict under
-    # you can can modules here based on the analysis_params with this dict
+    # you can add modules here based on the analysis_params with this dict
     # when implementing multiple analysis steps: loop over them
     # this is done by looping over analysis_params["analysis"]
     # the tuples in the list will be changed to ("res", your_res:str) and you can print your_res at the end
-
-    raise NotImplementedError()
-    
+    for module,a_args in analysis_params["analysis"]:
+        try: analysis[module]
+        except: raise Exception("no module found")
+        print(module)
+        if module in ["accuracy","precision","recall"]:
+            data_params1 = a_args
+            if data_params1 != None: data_params = data_params1
+            print(analysis[module].metric(data_params,model))
 
 # helper functions
 
-def get_dataset(data_params:dict) -> tbd:
-    '''
-    this is mainly for testing
+# def get_dataset(data_params:dict) -> tbd:
+#     '''
+#     this is mainly for testing
 
-    Calls dataset.py to retrieve dataset (train/test or both ?? TBD)
-    '''
-    #dataset.get_dataset(data_params) #should be enough here
-    raise NotImplementedError()
+#     Calls dataset.py to retrieve dataset (train/test or both ?? TBD)
+#     '''
+#     #dataset.get_dataset(data_params) #should be enough here
+#     raise NotImplementedError()
 
 def get_model(model_params:dict, trainset:tbd) -> tf.keras.Model:
     '''
