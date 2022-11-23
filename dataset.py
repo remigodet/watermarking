@@ -31,7 +31,9 @@ def get_dataset(data_params: dict):
         X_a.append(X[i])
         y_a.append(y[i])
     # X_set_sample.shape =( n, 32, 32, 3) , y_set_sample = (n,1)
-    return(np.array(X_a), np.array(y_a))
+    X_a = np.array(X_a, dtype=np.uint8)
+    y_a = np.array(y_a, dtype=np.uint8)
+    return(X_a, y_a)
 
 
 if __name__ == "__main__":

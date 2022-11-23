@@ -9,12 +9,12 @@ def metric(model,data_params,trigger_params): #prend en argument le np.array des
     else:
         X_test,y_test = dataset.get_dataset(data_params)
     y_predict=model.predict(X_test)
+    y_test = y_test.flatten()
     correct = 0
     total = len(y_predict)
-
     for i in range(total):
         c_pred = np.argmax(y_predict[i])
-        c_test = y_test[i][0]
+        c_test = y_test[i]
         if c_pred == c_test:
             correct +=1
     # # if data_params["dataset"]=="cifar-10":
