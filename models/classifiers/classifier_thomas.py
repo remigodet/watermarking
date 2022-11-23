@@ -65,16 +65,18 @@ def get_model(model_params: dict, data_params: dict, model):
                 model.add(layers.Dense(nb_targets, activation='softmax'))
             opt = optimizer(learning_rate=learning_rate)
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
-            model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
+           # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
 
     else:
-        try:  model_params['hyperparams'] != None
-        except: raise Exception("No hyperparams in calling ")
+        try:
+            model_params['hyperparams'] != None
+        except:
+            raise Exception("No hyperparams in calling ")
         model = train(model_params, model, data_params)
 
     if model_params['to save']:
         save(model, model_params)
-    return model, model_params
+    return model
 
 
 def train(model_params: dict, model: tf.keras.Model, data_params: dict):
@@ -87,10 +89,9 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
     # triggerset may be None (removal of the WM)
     # shuffle train and trigger set
 
-    
     def shuffle(train_set, trigger_set, params):
         nb_app_epoch = params['wm']['nb_app_epoch']
-        train_ratio = params['train_ratio']
+        train_ratio = params['hyperparams']['train_ratio']
         X_train, y_train = train_set
         X_trigg, y_trigg = trigger_set
         X = []
@@ -104,7 +105,6 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
             y.append(y_trigg[i % len(X_trigg)])
 
         listesFusionnées = list(zip(X, y))
-        print(len(X), len(y))
         # print(listesFusionnées[0])
         random.shuffle(listesFusionnées)
         X, y = zip(*listesFusionnées)
@@ -114,30 +114,44 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         y_train, y_val = y[:int(train_ratio*len(X))
                            ], y[int(train_ratio*len(X)):]
 
-        return X_train, y_train, X_val, y_val
+        return np.array(X_train), np.array(y_train), np.array(X_val), np.array(y_val)
 
-    # getting parameters 
-    
-    optimizer =  model_params['hyperparams']['optimizer']
-    learning_rate =  model_params['hyperparams']['learning_rate']
-    loss =  model_params['hyperparams']['loss']
-    batch_size =  model_params['hyperparams']['batch_size']
-    epochs =  model_params['hyperparams']['nb_epochs']
+    # getting parameters
+
+    optimizer = model_params['hyperparams']['optimizer']
+    learning_rate = model_params['hyperparams']['learning_rate']
+    loss = model_params['hyperparams']['loss']
+    batch_size = model_params['hyperparams']['batch_size']
+    epochs = model_params['hyperparams']['nb_epochs']
     opt = optimizer(learning_rate=learning_rate)
-    
 
-    # dataset
-    trainset = dataset.get_dataset(data_params=data_params)
-    triggerset = triggerset.get_triggerset(
-        model_params['wm'])  # A faire seulement si il existe
-    # training
-    X_train, y_train, X_val, y_val = shuffle(
-        trainset, triggerset, model_params)
-    model.compile(optimizer=opt, loss=loss, metrics='accuracy') # à voir
-    model.fit(X_train, y_train, validation_data=(
-        X_val, y_val), batch_size=batch_size, epochs=epochs)
+    if model_params['wm'] != None:
 
-    return model
+        # dataset
+        trainset = dataset.get_dataset(data_params=data_params)
+        triggerset = dataset.get_dataset(
+            data_params=data_params)  # A faire seulement si il existe ## ATTENTION CE N'EST PAS LE BON SET
+        # training
+        X_train, y_train, X_val, y_val = shuffle(
+            trainset, triggerset, model_params)
+        # model.compile(optimizer=opt, loss=loss, metrics='accuracy')  # à voir
+
+        model.fit(X_train, y_train, validation_data=(
+            X_val, y_val), batch_size=batch_size, epochs=epochs)
+
+        return model
+
+    else:
+
+        # dataset
+        X_train, y_train = dataset.get_dataset(data_params)
+
+        # training
+
+        model.compile(optimizer=opt, loss=loss, metrics='accuracy')  # à voir
+        model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
+
+        return model
 
 # save
 
@@ -164,7 +178,7 @@ def load(model_params: dict):
     if name == None:
         print('the model is not saved yet')
 
-    model = models.load_model('./models/saved/'+name+'.tf')
+    model = models.load_model('./models/saved/'+name)
     print('Model loaded succesfully')
     print(type(model))
     return model

@@ -23,6 +23,7 @@ def get_dataset(data_params: dict):
         X = X_trigger
         y = y_trigger
     X = list(X)
+    np.random.seed(data_params["seed"])
     index = np.random.randint(len(X), size=n)
     X_a = []
     y_a = []

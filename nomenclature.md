@@ -48,30 +48,36 @@ hyperparams = dict
 _? name your dict as you want ex: "type" for the type of trigger set: from the dataset or random or else_
 _may include data_params if needed_
 
-\_ajouter les params pour models.classifiers.classifiers1.train pour faire le bon shuffle entre le train set et le triggerset
-
-## "n":int th enumber of images generated
-
+ajouter les params pour models.classifiers.classifiers1.train pour faire le bon shuffle entre le train set et le triggerset
+"n":int the number of images generated (pour l'instant faire moins de 100 images à cause des images ext)
+"variance":int the variance of the noise
+"from":str "dataset", "ext"
+"noise":bool
+"seed" : permet d'avoir toujours les mêmes images du dataset si nécessaire
+------------------------------------------------------------------------------
 trigger_params = dict
 {
-"n" : 120,
-"nb_app_epoch" : 3
+    "n" : 50,
+    "variance":5,
+    "from": 'dataset',
+    "noise":True,
+    "seed":2
 }
 
 # data_params
 
 "dataset" cifar-10 cifar-100 client etc...(add here if needed)
-"datatype" is train test or validation dataset
+"set" is train test or validation dataset or trigger
 "n" number of images
-
----
-
+"seed" int to get the same random images if necessary
+------------------------------------------------------------------------------
 data_params = dict
 {
-"dataset":"cifar-10";
-"set" : "train",
-"n" : 2000,
-}
+    "dataset":"cifar-10";
+    "set" : "train",
+    "n" : 2000,
+    "seed" : 2
+
 
 # analysis_params
 
