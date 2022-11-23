@@ -178,7 +178,7 @@ def load(model_params: dict):
     if name == None:
         print('the model is not saved yet')
 
-    model = models.load_model('./models/saved/'+name)
+    model = models.load_model('./models/saved/'+name+'.tf')
     print('Model loaded succesfully')
     print(type(model))
     return model

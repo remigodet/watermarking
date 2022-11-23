@@ -86,7 +86,8 @@ list for having mutiple processes
 tuple is ("type of process", arguments needed to do it (may be a list)) # example : ("wm", trigger_params) et dataset ?
 
 _define the processes tuples here_
-"wm" #todo
+("wm" , (model_params,trigger_params,data_params))
+("train", (model_params,data_params))
 
 ---
 
@@ -101,6 +102,8 @@ _add tuples (modules and what the inputs are)_
 
 analysis_params = dict
 {
-"processes": [("wm", trigger_params)],
-"analysis": [("metrics", data_params)]
+"processes": [("wm", trigger_params),....],
+"analysis": [("metrics", data_params),
+             ()   
+                ?....]
 }
