@@ -4,7 +4,7 @@ import dataset #if needed
 
 #train
 
-def get_model(model_params:dict, trainset:tbd) -> (tf.keras.Model, dict):
+def get_model(model_params:dict, trainset,model):
     '''
     to be called by main.py to get the correct model
     This return the model and the model_params (useful if this was a saved model)
@@ -18,7 +18,7 @@ def get_model(model_params:dict, trainset:tbd) -> (tf.keras.Model, dict):
     # to get trigger set see main.py for example
     raise NotImplementedError()
 
-def train(model_params:dict, model:tf.keras.Model, trainset:tbd, triggerset:tbd) -> tf.keras.Model:
+def train(model_params:dict, model, trainset:dict, triggerset:dict):
     '''
     May be called from main.py
     Trains the model according to model_params and with training dataset from main.py 
@@ -31,7 +31,7 @@ def train(model_params:dict, model:tf.keras.Model, trainset:tbd, triggerset:tbd)
 
 
 #save
-def save(model:tf.keras.Model, model_params:dict) -> None:
+def save(model, model_params:dict) -> None:
     '''
     This saves your model and the params in ./models/saved/your_model.py
     '''

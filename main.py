@@ -1,27 +1,27 @@
 #imports
 import tensorflow as tf
 import dataset
+from tensorflow import keras
 
 # /!\ add your models here ! 
 import models.classifiers.classifier1 as classifier1
+import models.classifiers.classifier_thomas as classifier_thomas
 # /!\ add your model in this dict ! 
-models = dict
-{
+models = {
     # this is to train models automatically
     "classifier1":classifier1,
+    "classifier_thomas":classifier_thomas,
 }
 
 # /!\ add your analysis modules here ! 
 import analysis.metrics as metrics
 # /!\ add your model in this dict ! 
-analysis = dict
-{
+analysis = {
     # this is to use analysis automatically
     "metrics":metrics,
 }
 
-# code
-model = None
+
 # main functions
 def main(model_params:dict,data_params:dict,analysis_params:dict=None) -> str:
     ''' This is the main function.
@@ -31,20 +31,19 @@ def main(model_params:dict,data_params:dict,analysis_params:dict=None) -> str:
     Prints and returns the results.
     '''
     #model_setup
-
-    model = model_setup(model_params)
+    model = None
+    model = model_setup(model_params,data_params,model)
     #process
     model = process(model, analysis_params, data_params)
     #analysis
-    analysis(model, analysis_params, data_params)
-    #result
-    
-    print("main: NotImplemented")
-    raise NotImplementedError()
+    result(model, analysis_params, data_params)
+    #
+    # do the results  
 
-def model_setup(model_params:dict,) -> tf.keras.Model:
+def model_setup(model_params:dict,data_params:dict,model) -> tf.keras.Model:
     '''
     Function responsible for reading model_params dict
+    data_params is needed to have the size of the images (will not train)
 
     train models from ./models/classifiers or load them from ./models/saved
 
@@ -52,7 +51,7 @@ def model_setup(model_params:dict,) -> tf.keras.Model:
     '''
     #saved model model_params has no need to be passed to load a model
     # getting model
-    model = models[model_params["classifier"]].get_model(model_params, None, model)
+    model = models[model_params["classifier"]].get_model(model_params, data_params, model)
     try: model is not None
     except: raise Exception("Model is None. Verify loading names and parameters.")
 
@@ -72,19 +71,20 @@ def process(model: tf.keras.Model, analysis_params:dict , data_params:dict) -> t
     # this is done by looping over analysis_params["processes"]
     # the dataset may be taken from the function argument or from the analysis_params dict
     # or just use classifiers module.train which will accept a model already trained ... 
-
+   
     for process, p_args in analysis_params["processes"]:
-            #train
-            if process == "train":
-                model_params, data_params1 = p_args
-                if data_params1 != None: data_params = data_params1
-                model = models[model_params["classifier"]].get_model(model_params, data_params, model)
-            #watermark
-            if process == "wm":
-                model_params,trigger_params, data_params1 = p_args
-                if data_params1 != None: data_params = data_params1
-                if trigger_params!= None: model_params["wm"]=trigger_params
-                model = models[model_params["classifier"]].get_model(model_params, data_params, model)
+        print(process)
+        #train
+        if process == "train":
+            model_params, data_params1 = p_args
+            if data_params1 != None: data_params = data_params1
+            model = models[model_params["classifier"]].get_model(model_params, data_params, model)
+        #watermark
+        if process == "wm":
+            model_params,trigger_params, data_params1 = p_args
+            if data_params1 != None: data_params = data_params1
+            if trigger_params!= None: model_params["wm"]=trigger_params
+            model = models[model_params["classifier"]].get_model(model_params, data_params, model)
     return model
     
 
@@ -115,12 +115,15 @@ def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> Non
     for module,a_args in analysis_params["analysis"]:
         try: analysis[module]
         except: raise Exception("no module found")
-        print(module)
-        if module in ["accuracy","precision","recall"]:
+        if module in ["metrics"]:
+            #testing
+            analysis[module].metric(model, analysis_params)
+        elif module in ["accuracy","precision","recall"]:
             data_params1 = a_args
             if data_params1 != None: data_params = data_params1
             print(analysis[module].metric(data_params,model))
-
+        else:
+            raise NotImplementedError("analysis module behavior not defined in result")
 # helper functions
 
 # def get_dataset(data_params:dict) -> tbd:
@@ -132,15 +135,15 @@ def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> Non
 #     #dataset.get_dataset(data_params) #should be enough here
 #     raise NotImplementedError()
 
-def get_model(model_params:dict, trainset:tbd) -> tf.keras.Model:
-    '''
-    this is mainly for testing
+# def get_model(model_params:dict, trainset:tbd) -> tf.keras.Model:
+#     '''
+#     this is mainly for testing
 
-    Calls ./models/classifiers/module.py to
-    retrieve the model
-    '''
-    #the module to use is in models_params
-    raise NotImplementedError()
+#     Calls ./models/classifiers/module.py to
+#     retrieve the model
+#     '''
+#     #the module to use is in models_params
+#     raise NotImplementedError()
 
 #to copy for new function
 def func(param:type) -> None:
@@ -150,34 +153,67 @@ def func(param:type) -> None:
  ## main
 if __name__ == "__main__":
     #set the dict here
-    data_params = dict
-    {
-        "dataset":"cifar-10",
-        "datatype" : "train",
-        "n" : 2000,
+    hyperparams = {
+        "train_ratio": 0.5,
+        "val_ration": 0.3,
+        "test_ration": 0.2,
+        "batch_size": 32,
+        'nb_epochs': 3,
+        'learning_rate': 1e-3,
+        'archi': 'convo',  # or 'dense'
+        'kernel_size': (3, 3),
+        'activation': 'relu',
+        'nb_targets': 10,
+        'nb_layers': 2,
+        'add_pooling': True,
+        'pooling_size': (2, 2),
+        'nb_units': [32, 64],
+        'optimizer': keras.optimizers.Adam,
+        'loss': 'sparse_categorical_crossentropy',  # 'metrics' : ['accuracy'],
     }
-    hyperparams = dict
-    {
-        "test" : 1,
-        "test2" : 2,
+
+    trigger_params = {
+        "n": 120,
+        "nb_app_epoch": 3
     }
-    trigger_params = dict
-    {
-        "n" : 120,
+
+    model_params = {
+        "saved":"wm2saved",
+        "to save":False,
+        "classifier": "classifier_thomas",
+        "hyperparams": hyperparams,
+        "wm": None,
     }
-    model_params = dict
-    {
+
+    data_params = {
+        "dataset": "cifar-10",
+        "set": "train",
+        "n": 200,
+        "seed":42 
+    }
+
+
+
+    trigger_params = {
+        "n": 120,
+        "nb_app_epoch": 3
+    }
+
+    model_params2 = {
         "saved": None,
-        "to save":"model1-remi",
-        "classifier":"classifier1",
-        "hyperparams": hyperparams, # you can define it before for readibility
-        "wm": trigger_params, # you can define it before for readibility
+        "to save": "wm2saved",
+        "classifier": "classifier_thomas",
+        "hyperparams": hyperparams,
+        "wm": trigger_params,
     }
-    analysis_params = dict
-    {
-        "processes": [("wm", trigger_params)],
+    analysis_params =  {
+        "processes": [("wm", (model_params2,trigger_params,data_params)),("wm2", (model_params2,trigger_params,data_params))],
         "analysis": [("metrics", data_params)]
     }
+    
+    main(model_params=model_params,
+        data_params=data_params,
+        analysis_params=analysis_params)
 
     print("all done")
 
