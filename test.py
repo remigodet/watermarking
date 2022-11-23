@@ -395,7 +395,7 @@ hyperparams = {
     'pooling_size': (2, 2),
     'nb_units': [32, 64],
     'optimizer': keras.optimizers.Adam,
-    'loss': 'sparse_categorical_crossentropy',  # 'metrics' : ['accuracy'],
+    'loss': 'sparse_categorical_crossentropy', 
 }
 
 trigger_params = {
