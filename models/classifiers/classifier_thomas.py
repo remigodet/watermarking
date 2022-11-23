@@ -94,6 +94,11 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         train_ratio = params['hyperparams']['train_ratio']
         X_train, y_train = train_set
         X_trigg, y_trigg = trigger_set
+
+        #DEBUG
+        # int_type = type(trainset[0][0][0][0])
+        # X_trigg = X_trigg.astype(int_type)
+
         X = []
         y = []
         for i in range(len(X_train)):
@@ -130,13 +135,19 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         # dataset
         trainset = dataset.get_dataset(data_params=data_params)
         trigger = triggerset.get_triggerset(model_params["wm"])
+        
         # training
         X_train, y_train, X_val, y_val = shuffle(
             trainset, trigger, model_params)
         # model.compile(optimizer=opt, loss=loss, metrics='accuracy')  # à voir
+        # X_train = list (X_train)
+        X_train = np.asarray(X_train).astype(np.uint8)
+        X_train = tf.convert_to_tensor(X_train)
 
-        model.fit(X_train, y_train, validation_data=(
-            X_val, y_val), batch_size=batch_size, epochs=epochs)
+        y_train = np.asarray(y_train).astype(np.uint8)
+        y_train = tf.convert_to_tensor(y_train)
+
+        model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
 
         return model
 
