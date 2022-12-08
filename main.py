@@ -179,10 +179,6 @@ if __name__ == "__main__":
         'loss': 'sparse_categorical_crossentropy',  # 'metrics' : ['accuracy'],
     }
 
-    trigger_params = {
-        "n": 100,
-        "nb_app_epoch": 10
-    }
 
     model_params = {
         "saved":False,
@@ -207,13 +203,14 @@ if __name__ == "__main__":
 
 
     trigger_params = {
-    "n" : 500,
-    "nb_app_epoch":20,
+    "n" : 50,
+    "nb_app_epoch":100,
     "variance":5,
     "from": 'dataset',
     "noise":True,
     "seed":2
 }
+
 
     model_params2 = {
         "saved": None,
@@ -223,7 +220,7 @@ if __name__ == "__main__":
         "wm": trigger_params,
     }
     analysis_params =  {
-        "processes": [("train", (model_params2,data_params)),("wm2", (model_params2,trigger_params,data_params))],
+        "processes": [("train", (model_params,data_params)),("wm", (model_params2,trigger_params,data_params))],
         "analysis": [("metrics", (data_params_test,False)),
                      ("accuracy", (data_params_test,False)),
                      ("precision", (data_params_test,False)),
@@ -232,7 +229,6 @@ if __name__ == "__main__":
                      ("accuracy", (data_params_test,trigger_params)),
                      ("confusion_matrix", (data_params_test, trigger_params))]
     }
-    
     main(model_params=model_params,
         data_params=data_params,
         analysis_params=analysis_params)

@@ -28,6 +28,8 @@ def metric(model,data_params,trigger_params): #prend en argument le np.array des
                 categories.append("trigger")
             else :
                 categories.append("not trigger")
+        print(y_test)
+        print(y_predict)
         result = confusion_matrix(y_test, y_predict)
     else:
         result = confusion_matrix(y_test, y_predict ,normalize='pred')
@@ -37,7 +39,7 @@ def metric(model,data_params,trigger_params): #prend en argument le np.array des
                   columns = categories)
     sns.heatmap(df_cm, annot=True,cmap=sns.cubehelix_palette(as_cmap=True))
     plt.show()
-    print("cm shown")
+    return "cm shown"
 
 if __name__ == "__main__":
     pass
