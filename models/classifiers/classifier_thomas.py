@@ -23,7 +23,6 @@ def get_model(model_params: dict, data_params: dict, model):
     # add trigger set in function arguments if can't use triggerset.py from here :) (modify main.py too)
     # check models_params and hyperparams are correctly filled in
     # to get trigger set see main.py for example
-
     if model == None:
         if model_params['saved'] not in [None, False]:
             model = load(model_params)
@@ -68,11 +67,11 @@ def get_model(model_params: dict, data_params: dict, model):
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
            # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
 
+    
+    if model_params['hyperparams'] == None:
+        pass
     else:
-        if model_params['hyperparams'] == None:
-            pass
-        else:
-            model = train(model_params, model, data_params)
+        model = train(model_params, model, data_params)
 
     if model_params['to save']:
         save(model, model_params)
@@ -94,10 +93,6 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         train_ratio = params['hyperparams']['train_ratio']
         X_train, y_train = train_set
         X_trigg, y_trigg = trigger_set
-
-        #DEBUG
-        # int_type = type(trainset[0][0][0][0])
-        # X_trigg = X_trigg.astype(int_type)
 
         X = []
         y = []
@@ -157,7 +152,6 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         X_train, y_train = dataset.get_dataset(data_params)
 
         # training
-
         model.compile(optimizer=opt, loss=loss, metrics='accuracy')  # à voir
         model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
 
@@ -175,6 +169,7 @@ def save(model: tf.keras.Model, model_params: dict) -> None:
     # ! if you do this you yill have to modify main.py to get those params !
     # i'd rather go with the first option.
     name = model_params['to save']
+    print(type(model))
     model.save(
         './models/saved/'+name+'.tf')
 

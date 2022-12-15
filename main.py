@@ -40,7 +40,7 @@ def main(model_params:dict,data_params:dict,analysis_params:dict=None) -> str:
     '''
     #model_setup
     model = None
-    model = model_setup(model_params,data_params,model)
+    # model = model_setup(model_params, data_params, model)
     #process
     model = process(model, analysis_params, data_params)
     #analysis
@@ -48,22 +48,22 @@ def main(model_params:dict,data_params:dict,analysis_params:dict=None) -> str:
     #
     # do the results  
 
-def model_setup(model_params:dict,data_params:dict,model) -> tf.keras.Model:
-    '''
-    Function responsible for reading model_params dict
-    data_params is needed to have the size of the images (will not train)
+# def model_setup(model_params:dict,data_params:dict,model) -> tf.keras.Model:
+#     '''
+#     Function responsible for reading model_params dict
+#     data_params is needed to have the size of the images (will not train)
 
-    train models from ./models/classifiers or load them from ./models/saved
+#     train models from ./models/classifiers or load them from ./models/saved
 
-    Please refer to nomenclature.md on how to fill out model_params
-    '''
-    #saved model model_params has no need to be passed to load a model
-    # getting model
-    model = models[model_params["classifier"]].get_model(model_params, data_params, model)
-    try: model is not None
-    except: raise Exception("Model is None. Verify loading names and parameters.")
+#     Please refer to nomenclature.md on how to fill out model_params
+#     '''
+#     #saved model model_params has no need to be passed to load a model
+#     # getting model
+#     model = models[model_params["classifier"]].get_model(model_params, data_params, model)
+#     try: model is not None
+#     except: raise Exception("Model is None. Verify loading names and parameters.")
 
-    return model
+#     return model
 
 def process(model: tf.keras.Model, analysis_params:dict , data_params:dict) -> tf.keras.Model:
     '''
@@ -165,7 +165,7 @@ if __name__ == "__main__":
         "val_ration": 0.3,
         "test_ration": 0.2,
         "batch_size": 32,
-        'nb_epochs': 10,
+        'nb_epochs': 5,
         'learning_rate': 3*1e-3,
         'archi': 'convo',  # or 'dense'
         'kernel_size': (3, 3),
@@ -177,15 +177,6 @@ if __name__ == "__main__":
         'nb_units': [32, 64],
         'optimizer': keras.optimizers.Adam,
         'loss': 'sparse_categorical_crossentropy',  # 'metrics' : ['accuracy'],
-    }
-
-
-    model_params = {
-        "saved":False,
-        "to save":False,
-        "classifier": "classifier_thomas",
-        "hyperparams": hyperparams,
-        "wm": None,
     }
 
     data_params= {
@@ -201,33 +192,71 @@ if __name__ == "__main__":
         "seed":42 
     }
 
-
     trigger_params = {
     "n" : 50,
     "nb_app_epoch":100,
     "variance":5,
     "from": 'dataset',
-    "noise":True,
+    "noise":False,
     "seed":2
-}
+    }
+    trigger_params2 = {
+    "n" : 50,
+    "nb_app_epoch":100,
+    "variance":5,
+    "from": 'dataset',
+    "noise":False,
+    "seed":3
+    }
 
-
-    model_params2 = {
-        "saved": None,
-        "to save": "integration_test2",
+    model_params = {
+        "saved": "removal_before",
+        "to save": "removal_after",
+        "classifier": "classifier_thomas",
+        "hyperparams": hyperparams,
+        "wm": None,
+    }
+    model_params_wm1 = {
+        "saved": "None",
+        "to save": "removal_before",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": trigger_params,
     }
+    model_params_wm2 = {
+        "saved": "test2-WM1",
+        "to save": "test2-WM2",
+        "classifier": "classifier_thomas",
+        "hyperparams": hyperparams,
+        "wm": trigger_params2,
+    }
+
+    model_params_visu = {
+        "saved": "test2-WM2",
+        "to save": None,
+        "classifier": "classifier_thomas",
+        "hyperparams": None,
+        "wm": None,
+    }
     analysis_params =  {
-        "processes": [("train", (model_params,data_params)),("wm", (model_params2,trigger_params,data_params))],
+        # "processes": [("train", (model_params,data_params)),("wm", (model_params2,trigger_params,data_params))],
+        #("train", (model_params,data_params)),
+        # ("wm", (model_params_wm,None,data_params))
+        "processes": [  
+                        # ("train",(model_params_visu,data_params))
+                        ("train", (model_params,data_params)),
+                        # ("wm", (model_params_wm1,None,data_params))
+                        # ("train", (model_params,None,data_params))
+                      ],
         "analysis": [("metrics", (data_params_test,False)),
                      ("accuracy", (data_params_test,False)),
                      ("precision", (data_params_test,False)),
                      ("recall", (data_params_test,False)),
                      ("confusion_matrix", (data_params_test, False)),
-                     ("accuracy", (data_params_test,trigger_params)),
-                     ("confusion_matrix", (data_params_test, trigger_params))]
+                    #  ("accuracy", (data_params_test,trigger_params)),
+                     ("confusion_matrix", (data_params_test, trigger_params)),
+                    #  ("confusion_matrix", (data_params_test, trigger_params2))
+                    ]
     }
     main(model_params=model_params,
         data_params=data_params,

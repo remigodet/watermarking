@@ -49,6 +49,7 @@ def get_triggerset(trigger_params: dict):
         X_a = []
         np.random.seed(trigger_params["seed"])
         label0 = y_a[np.random.randint(0, y_a.shape[0])]
+        print("LABEL", label0)
         for i, label in enumerate(y_a):
             if label != label0:
                 X_a.append(X_b[i])
@@ -66,6 +67,7 @@ def get_triggerset(trigger_params: dict):
         labels = [0,1,2,3,4,5,6,7,8,9]
         np.random.seed(trigger_params["seed"])
         label0 = labels[np.random.randint(0, 11)]
+        print("LABEL",label0)
         y_a = np.array(n*[label0])  # tous le même label
 
     # On réduit à n images
