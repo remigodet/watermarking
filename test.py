@@ -29,7 +29,7 @@ hyperparams = {
     'loss': 'sparse_categorical_crossentropy',  # 'metrics' : ['accuracy'],
 }
 
-trigger_params = trigger_params = dict
+trigger_params = dict
 {
     "n": 120,
     "nb_app_epoch": 3
