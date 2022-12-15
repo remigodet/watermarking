@@ -7,7 +7,7 @@ from tensorflow import keras
 def get_dataset(data_params: dict):
     datatype = data_params["set"]
     n = data_params["n"]
-    lenght = 10000 # divide the dataset into train and test (fixed constant)
+    lenght = 10000  # divide the dataset into train and test (fixed constant)
     if data_params["dataset"] == "cifar-10":
         (X_pretest, y_pretest), (X_test, y_test) = keras.datasets.cifar10.load_data()
     X_trigger, y_trigger = X_pretest[0:lenght], y_pretest[0:lenght]
