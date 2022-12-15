@@ -167,6 +167,7 @@ def func(param: type) -> None:
     ''' docstring '''
     raise NotImplementedError()
 
+
  # main
 if __name__ == "__main__":
     # set the dict here
@@ -258,8 +259,7 @@ if __name__ == "__main__":
             # ("wm", (model_params_wm1,None,data_params))
             # ("train", (model_params,None,data_params))
         ],
-        "analysis": [("metrics", (data_params_test, False)),
-                     ("accuracy", (data_params_test, False)),
+        "analysis": [("accuracy", (data_params_test, False)),
                      ("precision", (data_params_test, False)),
                      ("recall", (data_params_test, False)),
                      ("confusion_matrix", (data_params_test, False)),
