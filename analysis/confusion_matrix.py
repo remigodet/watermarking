@@ -22,19 +22,18 @@ def metric(model,data_params,trigger_params): #prend en argument le np.array des
         categories = []
         set_i_trigger = set(y_test.flatten())
         set_i = set(y_predict.flatten()).union(set_i_trigger)
-        
-        for i in list(set_i):
+        for i in sorted(list(set_i)):
             if i in set_i_trigger:
                 categories.append("trigger")
             else :
                 categories.append("not trigger")
-        print(y_test)
-        print(y_predict)
+        # print(y_test)
+        # print(y_predict)
         result = confusion_matrix(y_test, y_predict)
     else:
         result = confusion_matrix(y_test, y_predict ,normalize='pred')
-    print(categories)
-    print(result)
+    # print(categories)
+    # print(result)
     df_cm = pd.DataFrame(result, index = categories,
                   columns = categories)
     sns.heatmap(df_cm, annot=True,cmap=sns.cubehelix_palette(as_cmap=True))
