@@ -177,14 +177,14 @@ if __name__ == "__main__":
         "batch_size": 32,
         'nb_epochs': 5,
         'learning_rate': 3*1e-3,
-        'archi': 'convo',  # or 'dense'
+        'archi': 'boost',  # or 'dense'
         'kernel_size': (3, 3),
         'activation': 'relu',
         'nb_targets': 10,
-        'nb_layers': 2,
+        'nb_layers': 3,
         'add_pooling': True,
         'pooling_size': (2, 2),
-        'nb_units': [32, 64],
+        'nb_units': [32, 64, 128, 1024],
         'optimizer': keras.optimizers.Adam,
         'loss': 'sparse_categorical_crossentropy',  # 'metrics' : ['accuracy'],
     }
@@ -220,7 +220,7 @@ if __name__ == "__main__":
     }
 
     model_params = {
-        "saved": "removal_before",
+        "saved": None,
         "to save": "removal_after",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
@@ -234,7 +234,7 @@ if __name__ == "__main__":
         "wm": trigger_params,
     }
     model_params_wm2 = {
-        "saved": "test2-WM1",
+        "saved": None,
         "to save": "test2-WM2",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
@@ -242,7 +242,7 @@ if __name__ == "__main__":
     }
 
     model_params_visu = {
-        "saved": "test2-WM2",
+        "saved": None,
         "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": None,
@@ -264,7 +264,7 @@ if __name__ == "__main__":
                      ("recall", (data_params_test, False)),
                      ("confusion_matrix", (data_params_test, False)),
                      #  ("accuracy", (data_params_test,trigger_params)),
-                     ("confusion_matrix", (data_params_test, trigger_params)),
+                     #("confusion_matrix", (data_params_test, trigger_params)),
                      #  ("confusion_matrix", (data_params_test, trigger_params2))
                      ]
     }

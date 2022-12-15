@@ -44,7 +44,6 @@ def get_model(model_params: dict, data_params: dict, model):
             optimizer = params['optimizer']
             learning_rate = params['learning_rate']
             loss = params['loss']
-
             if archi == 'dense':
                 model = keras.Sequential(
                     [layers.Flatten(input_shape=data_shape)]
@@ -53,7 +52,7 @@ def get_model(model_params: dict, data_params: dict, model):
                     model.add(layers.Dense(nb_units[i], activation=activation))
                 model.add(layers.Dense(nb_targets, activation='sigmoid'))
 
-            elif archi == 'convo':
+            if archi == 'convo':
                 model = keras.Sequential()
                 for i in range(nb_layers):
                     model.add(layers.Conv2D(
@@ -63,11 +62,54 @@ def get_model(model_params: dict, data_params: dict, model):
                 model.add(layers.Flatten())
                 model.add(layers.Dense(nb_units[-1], activation='relu'))
                 model.add(layers.Dense(nb_targets, activation='softmax'))
+
+            if archi == 'boost':
+                model = keras.Sequential()
+                # layers_mod = [layers.Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=data_shape),
+                #               layers.BatchNormalization(),
+                #               layers.Conv2D(32, (3, 3), activation='relu',
+                #                             padding='same'),
+                #               layers.BatchNormalization(),
+                #               layers.MaxPool2D((2, 2)),
+                #               layers.Conv2D(64, (3, 3), activation='relu',
+                #                             padding='same'),
+                #               layers.BatchNormalization(),
+                #               layers.Conv2D(64, (3, 3), activation='relu',
+                #                             padding='same'),
+                #               layers.BatchNormalization(),
+                #               layers.MaxPool2D((2, 2)),
+                #               layers.Conv2D(
+                #     128, (3, 3), activation='relu', padding='same'),
+                #     layers.BatchNormalization(),
+                #     layers.Conv2D(
+                #     128, (3, 3), activation='relu', padding='same'),
+                #     layers.BatchNormalization(),
+                #     layers.MaxPool2D((2, 2)),
+                #     layers.Flatten(),
+                #     layers.Dropout(0.2),
+                #     layers.Dense(1024, activation='relu'),
+                #     layers.Dropout(0.2),
+                #     layers.Dense(nb_targets, activation='softmax')]
+
+                # for layer in layers_mod:
+                #     model.add(layer)
+                for i in range(nb_layers):
+                    model.add(layers.Conv2D(nb_units[i], kernel_size=kernel_size, activation=activation, padding='same', input_shape=data_shape))
+                    model.add(layers.BatchNormalization())
+                    model.add(layers.Conv2D(nb_units[i], kernel_size=kernel_size, activation=activation, padding='same', input_shape=data_shape))
+                    model.add(layers.BatchNormalization())
+                    if add_pooling:
+                        model.add(layers.MaxPool2D(pool_size=pooling_size))
+                model.add(layers.Flatten())
+                model.add(layers.Dropout(0.2))
+                model.add(layers.Dense(nb_units[-1], activation = activation))
+                model.add(layers.Dropout(0.2))
+                model.add(layers.Dense(nb_targets, activation = 'softmax'))
+
             opt = optimizer(learning_rate=learning_rate)
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
            # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
 
-    
     if model_params['hyperparams'] == None:
         pass
     else:
@@ -130,7 +172,7 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         # dataset
         trainset = dataset.get_dataset(data_params=data_params)
         trigger = triggerset.get_triggerset(model_params["wm"])
-        
+
         # training
         X_train, y_train, X_val, y_val = shuffle(
             trainset, trigger, model_params)
