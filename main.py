@@ -2,7 +2,8 @@
 import tensorflow as tf
 import dataset
 from tensorflow import keras
-
+import pandas as pd
+import numpy as np
 # /!\ add your models here ! 
 import models.classifiers.classifier1 as classifier1
 import models.classifiers.classifier_thomas as classifier_thomas
@@ -19,6 +20,7 @@ import analysis.accuracy as accuracy
 import analysis.precision as precision
 import analysis.recall as recall
 import analysis.confusion_matrix as confusion_matrix
+#from finetuning import fineT
 # /!\ add your model in this dict ! 
 analysis = {
     # this is to use analysis automatically
@@ -28,8 +30,8 @@ analysis = {
     "recall":recall,
     "confusion_matrix":confusion_matrix
 }
-
-
+metrics_value={}
+# results={}
 # main functions
 def main(model_params:dict,data_params:dict,analysis_params:dict=None) -> str:
     ''' This is the main function.
@@ -44,8 +46,10 @@ def main(model_params:dict,data_params:dict,analysis_params:dict=None) -> str:
     #process
     model = process(model, analysis_params, data_params)
     #analysis
-    result(model, analysis_params, data_params)
-    #
+    results=result(model, analysis_params, data_params)
+    # n=fineT.shape[0]
+    # fineT[f'model {n+1}']=model_params['hyperparams']
+    #fineT[f'model {n+1}']=[model_params,result(model, analysis_params, data_params)]
     # do the results  
 
 def model_setup(model_params:dict,data_params:dict,model) -> tf.keras.Model:
@@ -97,7 +101,6 @@ def process(model: tf.keras.Model, analysis_params:dict , data_params:dict) -> t
     
 
 def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> None:
-    
     '''
     This is the analysis part of main.py. 
     where the processed model is assessed (accuracy, recall, precision, robustness)
@@ -126,9 +129,14 @@ def result(model: tf.keras.Model, analysis_params:dict, data_params:dict) -> Non
         except: raise Exception("no module found")
         if module in ["metrics"]:
             analysis[module].metric(model, analysis_params)
-        elif module in ["accuracy","precision","recall","confusion_matrix"]:
+        elif module in ["accuracy"]:
             data_params1,use_trigger = a_args
             print(analysis[module].metric(model,data_params,use_trigger))
+            metrics_value[module]=analysis[module].metric(model,data_params,use_trigger)#
+        # elif module in ["precision","recall","confusion_matrix"]:
+        #     data_params1,use_trigger = a_args
+        #     print(analysis[module].metric(model,data_params,use_trigger))
+        #     metrics_value[module]=analysis[module].metric(model,data_params,use_trigger)
         else:
             raise NotImplementedError("analysis module behavior not defined in result")
 # helper functions
@@ -159,6 +167,7 @@ def func(param:type) -> None:
 
  ## main
 if __name__ == "__main__":
+
     #set the dict here
     hyperparams = {
         "train_ratio": 0.5,
@@ -166,12 +175,12 @@ if __name__ == "__main__":
         "test_ration": 0.2,
         "batch_size": 32,
         'nb_epochs': 10,
-        'learning_rate': 3*1e-3,
+        'learning_rate': 3*1e-2, #3   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
         'archi': 'convo',  # or 'dense'
         'kernel_size': (3, 3),
         'activation': 'relu',
         'nb_targets': 10,
-        'nb_layers': 2,
+        'nb_layers': 3,
         'add_pooling': True,
         'pooling_size': (2, 2),
         'nb_units': [32, 64],
@@ -201,7 +210,7 @@ if __name__ == "__main__":
         "seed":42 
     }
 
-
+#comment stocker le résultat 
     trigger_params = {
     "n" : 50,
     "nb_app_epoch":100,
@@ -233,6 +242,25 @@ if __name__ == "__main__":
         data_params=data_params,
         analysis_params=analysis_params)
     # in metrics : categories if cifar-100 ???
+
+    #sauvegarde des résultats des ≠ tests avec les paramètres dans un fichier csv
+    init=True
+    if init:
+        fineT=pd.DataFrame(columns=list(hyperparams.keys())+list(metrics_value.keys()),
+                    index=[1],
+                    data=np.array(list(hyperparams.values())+list(metrics_value.values())).reshape(1,-1))
+        fineT.to_csv('finit.csv')
+    else:
+        fineT=pd.read_csv('finit.csv',index_col=0)
+        n=fineT.index[-1] +1
+        new_row=pd.DataFrame(columns=list(hyperparams.keys())+list(metrics_value.keys()),
+                            index=[n],
+                            data=np.array(list(hyperparams.values())+list(metrics_value.values())).reshape(1,-1))
+        finT=pd.concat([fineT,new_row],axis=0)
+        fineT.to_csv('finit.csv')
+
+    print(metrics_value)
+
     print("all done")
 
 

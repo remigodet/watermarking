@@ -68,11 +68,11 @@ def get_model(model_params: dict, data_params: dict, model):
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
            # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
 
+    
+    if model_params['hyperparams'] == None:
+        pass
     else:
-        if model_params['hyperparams'] == None:
-            pass
-        else:
-            model = train(model_params, model, data_params)
+        model = train(model_params, model, data_params)
 
     if model_params['to save']:
         save(model, model_params)
@@ -188,7 +188,7 @@ def load(model_params: dict):
     if name == None:
         print('the model is not saved yet')
 
-    model = models.load_model('./models/saved/'+name+'.tf')
+    model = models.load_model('./models/saved/'+name+'.tf') #rajoure le elif
     print('Model loaded succesfully')
     print(type(model))
     return model

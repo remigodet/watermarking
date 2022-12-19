@@ -39,7 +39,10 @@ def metric(model,data_params,trigger_params): #prend en argument le np.array des
                   columns = categories)
     sns.heatmap(df_cm, annot=True,cmap=sns.cubehelix_palette(as_cmap=True))
     plt.show()
-    return "cm shown"
+    #return("cm swhown",df)
+    print("cm shown") #
+    return (df_cm)
+    #return ("cm shown")
 
 if __name__ == "__main__":
     pass

@@ -25,14 +25,15 @@ def metric(model,data_params,trigger_params): #prend en argument le np.array des
     # total_pred=res.shape[0]
     return(correct/total) #renvoie l'accuracy 
 
-if __name__ == "__main__":
-    dic_y_test={'class':['chien','chat']}
-    dic_y_predict={'class':['chien','chat']}
+# if __name__ == "__main__":
+#     dic_y_test={'class':['chien','chat']}
+#     dic_y_predict={'class':['chien','chat']}
 
-    df_y_test=[pd.DataFrame(dic_y_test)]
-    df_y_predict=pd.DataFrame(dic_y_predict)
+#     df_y_test=[pd.DataFrame(dic_y_test)]
+#     df_y_predict=pd.DataFrame(dic_y_predict)
 
-    array_y_test=np.array(['chat','chien'])
-    array_y_predict=np.array(['chien','chien'])
+#     array_y_test=np.array(['chat','chien'])
+#     array_y_predict=np.array(['chien','chien'])
 
-    print(metric(array_y_predict,array_y_test))
+#     print(metric(array_y_predict,array_y_test))
+   

@@ -42,19 +42,19 @@ def metric(model,data_params,trigger_params):
     return precisions,float(pd.DataFrame.from_dict(precisions, orient='index').mean())
     # return precisions
 
-if __name__ == "__main__":
-    data_params ={}
+# if __name__ == "__main__":
+#     data_params ={}
 
-    data_params["dataset"]="cifar-10"
-    data_params["set"]= "train"
-    data_params["n"]=  2000
-    dic_y_test={'class':['chien','chat']}
-    dic_y_predict={'class':['chien','chat']}
+#     data_params["dataset"]="cifar-10"
+#     data_params["set"]= "train"
+#     data_params["n"]=  2000
+#     dic_y_test={'class':['chien','chat']}
+#     dic_y_predict={'class':['chien','chat']}
 
-    df_y_test=[pd.DataFrame(dic_y_test)]
-    df_y_predict=pd.DataFrame(dic_y_predict)
+#     df_y_test=[pd.DataFrame(dic_y_test)]
+#     df_y_predict=pd.DataFrame(dic_y_predict)
 
-    array_y_test=np.array(['chat','chien','chat'])
-    array_y_predict=np.array(['chien','chien','chat'])
+#     array_y_test=np.array(['chat','chien','chat'])
+#     array_y_predict=np.array(['chien','chien','chat'])
 
-    print(metric(model,data_params))
+#     print(metric(model,data_params))
