@@ -82,8 +82,11 @@ data_params = dict
 
 # analysis_params
 
-processes:[tuple] what to do to the model before analysis
-list for having mutiple processes
+
+analysis_params: [tuples] each tuple is a step
+
+
+processes step : tuple what to do to the model before analysis
 tuple is ("type of process", arguments needed to do it (may be a list)) # example : ("wm", trigger_params) et dataset ?
 
 _define the processes tuples here_
@@ -92,24 +95,21 @@ _define the processes tuples here_
 
 ---
 
-analysis:[tuple] how to analyse the model
-list for having mutiple analysis
+analysis step : tuple how to analyse the model
 tuple is ("analysis module name", arguments needed to do it (may be a list))
 
 _add tuples (modules and what the inputs are)_
 "metrics" + data_params:dict + trigger:bool
-accuracy + data_params:dict + trigger:bool
-precision + data_params:dict + trigger:bool
-recall + data_params:dict + trigger:bool
+accuracy + label + data_params:dict + trigger:bool
+precision +label +  data_params:dict + trigger:bool
+recall + label + data_params:dict + trigger:bool
 confusion_matrix + data_params:dict + trigger:trigger_params (False if using dataset)
 
 
 ---
 
-analysis_params = dict
-{
-"processes": [("wm", trigger_params),....],
-"analysis": [("metrics", data_params),
-             ()   
-                ?....]
-}
+analysis_params = 
+[
+("wm", trigger_params),
+("metrics","label" / None data_params),
+]

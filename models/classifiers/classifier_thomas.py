@@ -211,7 +211,7 @@ def save(model: tf.keras.Model, model_params: dict) -> None:
     # ! if you do this you yill have to modify main.py to get those params !
     # i'd rather go with the first option.
     name = model_params['to save']
-    print(type(model))
+    # print(type(model))
     model.save(
         './models/saved/'+name+'.tf')
 
