@@ -28,7 +28,16 @@ analysis = {
     "recall": recall,
     "confusion_matrix": confusion_matrix
 }
-
+class colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 # main functions
 def main(model_params: dict, data_params: dict, analysis_params: dict = None) -> str:
@@ -41,12 +50,11 @@ def main(model_params: dict, data_params: dict, analysis_params: dict = None) ->
     # model_setup
     model = None
     # model = model_setup(model_params, data_params, model)
-    # process
-    model = process(model, analysis_params, data_params)
-    # analysis
-    result(model, analysis_params, data_params)
-    #
-    # do the results
+    # process & analysis
+    process(model, analysis_params, data_params)
+    print("safe", results)
+    print(colors.OKGREEN + str(results) +colors.ENDC)
+    
 
 # def model_setup(model_params:dict,data_params:dict,model) -> tf.keras.Model:
 #     '''
@@ -66,51 +74,13 @@ def main(model_params: dict, data_params: dict, analysis_params: dict = None) ->
 #     return model
 
 
-def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> tf.keras.Model:
+def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> None:
     '''
     This is the processing part of main.py 
     where the model is subjected to changes (watermarking, attacks, retrain, ...)
 
     trigger_params dict is used to get the trigger set from triggerset.py
     data_params dict is used to access the dataset to train the model further and try to remove the WM
-
-    Please refer to nomenclature.md on how to fill out the dictionaries
-    '''
-    # when implementing multiple analysis steps: loop over them
-    # this is done by looping over analysis_params["processes"]
-    # the dataset may be taken from the function argument or from the analysis_params dict
-    # or just use classifiers module.train which will accept a model already trained ...
-
-    for process, p_args in analysis_params["processes"]:
-        print(process)
-        # train
-        if process == "train":
-            model_params, data_params1 = p_args
-            if data_params1 != None:
-                data_params = data_params1
-            model = models[model_params["classifier"]].get_model(
-                model_params, data_params, model)
-        # watermark
-        if process == "wm":
-            model_params, trigger_params, data_params1 = p_args
-            if data_params1 != None:
-                data_params = data_params1
-            if trigger_params != None:
-                model_params["wm"] = trigger_params
-            model = models[model_params["classifier"]].get_model(
-                model_params, data_params, model)
-    return model
-
-
-def result(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> None:
-    '''
-    This is the analysis part of main.py. 
-    where the processed model is assessed (accuracy, recall, precision, robustness)
-
-    it will use the modules from ./analysis
-    prints clearly the result once done
-
-    /!\ (in the future may conduct several at once)
 
     /!\ don't forget to import those modules in main, like metrics.py
 
@@ -120,45 +90,85 @@ def result(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> N
 
     Please refer to nomenclature.md on how to fill out the dictionaries
     '''
-    # /!\ add modules in import and in the dict under
-    # you can add modules here based on the analysis_params with this dict
     # when implementing multiple analysis steps: loop over them
-    # this is done by looping over analysis_params["analysis"]
-    # the tuples in the list will be changed to ("res", your_res:str) and you can print your_res at the end
-    for module, a_args in analysis_params["analysis"]:
-        print(module)
-        try:
-            analysis[module]
-        except:
-            raise Exception("no module found")
-        if module in ["metrics"]:
-            analysis[module].metric(model, analysis_params)
-        elif module in ["accuracy", "precision", "recall", "confusion_matrix"]:
-            data_params1, use_trigger = a_args
-            print(analysis[module].metric(model, data_params, use_trigger))
+    # this is done by looping over analysis_params["processes"]
+    # the dataset may be taken from the function argument or from the analysis_params dict
+    # or just use classifiers module.train which will accept a model already trained ...
+    for step,step_label, step_args in analysis_params:
+        # colored printing
+        print(colors.OKBLUE + step +": "+ colors.OKCYAN+step_label+ colors.ENDC)
+        # train
+        if "train" == step:
+            model_params, data_params1 = step_args
+            if data_params1 != None:
+                data_params = data_params1
+            model = models[model_params["classifier"]].get_model(
+                model_params, data_params, model)
+        # watermark
+        elif "wm" == step:
+            model_params, trigger_params, data_params1 = step_args
+            if data_params1 != None:
+                data_params = data_params1
+            if trigger_params != None:
+                model_params["wm"] = trigger_params
+            model = models[model_params["classifier"]].get_model(
+                model_params, data_params, model)
+
+        #analysis
+        elif step in ["confusion_matrix"]:
+            data_params1, use_trigger = step_args
+            analysis[step].metric(model, data_params, use_trigger)
+
+        elif step in ["accuracy", "precision", "recall"]:
+            label = step_label
+            data_params1, use_trigger = step_args
+            res = analysis[step].metric(model, data_params, use_trigger)
+
+            if step in results.keys():
+                if label in results[step].keys():
+                    results[step][label] = results[step][label] + [res]
+                elif label is not None:
+                    results[step][label] = [res]
+            print(colors.OKGREEN+ str(res) + colors.ENDC)
+
         else:
-            raise NotImplementedError(
-                "analysis module behavior not defined in result")
-# helper functions
+            if step_args != None:
+                raise NotImplementedError(
+                "analysis module behavior not defined in main.py/process")
 
-# def get_dataset(data_params:dict) -> tbd:
-#     '''
-#     this is mainly for testing
+    # for process, p_args in analysis_params["processes"]:
+    #     print(process)
+    #     # train
+    #     if process == "train":
+    #         model_params, data_params1 = p_args
+    #         if data_params1 != None:
+    #             data_params = data_params1
+    #         model = models[model_params["classifier"]].get_model(
+    #             model_params, data_params, model)
+    #     # watermark
+    #     if process == "wm":
+    #         model_params, trigger_params, data_params1 = p_args
+    #         if data_params1 != None:
+    #             data_params = data_params1
+    #         if trigger_params != None:
+    #             model_params["wm"] = trigger_params
+    #         model = models[model_params["classifier"]].get_model(
+    #             model_params, data_params, model)
+    # for module, a_args in analysis_params["analysis"]:
+    #     print(module)
+    #     try:
+    #         analysis[module]
+    #     except:
+    #         raise Exception("no module found")
+    #     if module in ["metrics"]:
+    #         analysis[module].metric(model, analysis_params)
+    #     elif module in ["accuracy", "precision", "recall", "confusion_matrix"]:
+    #         data_params1, use_trigger = a_args
+    #         print(analysis[module].metric(model, data_params, use_trigger))
+    #     else:
+    #         raise NotImplementedError(
+    #             "analysis module behavior not defined in result")
 
-#     Calls dataset.py to retrieve dataset (train/test or both ?? TBD)
-#     '''
-#     #dataset.get_dataset(data_params) #should be enough here
-#     raise NotImplementedError()
-
-# def get_model(model_params:dict, trainset:tbd) -> tf.keras.Model:
-#     '''
-#     this is mainly for testing
-
-#     Calls ./models/classifiers/module.py to
-#     retrieve the model
-#     '''
-#     #the module to use is in models_params
-#     raise NotImplementedError()
 
 # to copy for new function
 
@@ -170,6 +180,14 @@ def func(param: type) -> None:
 
  # main
 if __name__ == "__main__":
+
+    # results
+
+    results = {
+        "accuracy": {},
+    }
+
+
     # set the dict here
     hyperparams = {
         "train_ratio": 0.5,
@@ -203,7 +221,7 @@ if __name__ == "__main__":
         "seed": 42
     }
 
-    trigger_params = {
+    trigger_params1 = {
         "n": 50,
         "nb_app_epoch": 100,
         "variance": 5,
@@ -220,54 +238,99 @@ if __name__ == "__main__":
         "seed": 3
     }
 
+    model_params_load = {
+        "saved": "WM1bis",
+        "to save": None,
+        "classifier": "classifier_thomas",
+        "hyperparams": None,
+        "wm": None,
+    }
+
     model_params = {
         "saved": None,
-        "to save": "removal_after",
+        "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": None,
     }
+    
     model_params_wm1 = {
-        "saved": "None",
-        "to save": "removal_before",
+        "saved": None,
+        "to save": "WM1",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
-        "wm": trigger_params,
+        "wm": trigger_params1,
     }
     model_params_wm2 = {
         "saved": None,
-        "to save": "test2-WM2",
+        "to save": "WM2",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": trigger_params2,
     }
 
     model_params_visu = {
-        "saved": None,
+        "saved": "to load",
         "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": None,
         "wm": None,
     }
-    analysis_params = {
-        # "processes": [("train", (model_params,data_params)),("wm", (model_params2,trigger_params,data_params))],
-        #("train", (model_params,data_params)),
-        # ("wm", (model_params_wm,None,data_params))
-        "processes": [
-            # ("train",(model_params_visu,data_params))
-            ("train", (model_params, data_params)),
-            # ("wm", (model_params_wm1,None,data_params))
-            # ("train", (model_params,None,data_params))
-        ],
-        "analysis": [("accuracy", (data_params_test, False)),
-                     ("precision", (data_params_test, False)),
-                     ("recall", (data_params_test, False)),
-                     ("confusion_matrix", (data_params_test, False)),
-                     #  ("accuracy", (data_params_test,trigger_params)),
-                     #("confusion_matrix", (data_params_test, trigger_params)),
-                     #  ("confusion_matrix", (data_params_test, trigger_params2))
-                     ]
-    }
+    analysis_params = [
+            ("train","Loading model",(model_params_load,data_params)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            ("wm","WM2", (model_params_wm2,None, data_params)),
+            ("accuracy", "model", (data_params_test, False)),
+            ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+
+            # Exemples
+            # ("train", (model_params, data_params)), #label is to save accuracy in a list
+            # ("wm", (model_params_wm,trigger_params ?,data_params)),
+            # ("confusion_matrix", (data_params_test, False)),
+            # ("accuracy","label" ?, (data_params_test,trigger_params ?)),
+
+    ]
     main(model_params=model_params,
          data_params=data_params,
          analysis_params=analysis_params)
