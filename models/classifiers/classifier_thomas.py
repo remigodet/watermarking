@@ -23,7 +23,8 @@ def get_model(model_params: dict, data_params: dict, model):
     # add trigger set in function arguments if can't use triggerset.py from here :) (modify main.py too)
     # check models_params and hyperparams are correctly filled in
     # to get trigger set see main.py for example
-    if model == None:
+    
+    if model == None or model_params["carry-on"] == False:
         if model_params['saved'] not in [None, False]:
             model = load(model_params)
         else:
@@ -108,9 +109,9 @@ def get_model(model_params: dict, data_params: dict, model):
 
             opt = optimizer(learning_rate=learning_rate)
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
-           # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
-
-    if model_params['hyperparams'] == None:
+            # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
+    
+    if model_params["do not train"] == True:
         pass
     else:
         model = train(model_params, model, data_params)
