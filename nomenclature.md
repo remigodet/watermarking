@@ -7,6 +7,8 @@ We define the different parameters dict here.
 "classifier":str the module used to train the model
 "hyperparams":dict dict of hyperparameters for model traning (epochs etc)
 "wm":trigger*params dict the trigger set to use if none: no WM
+"do not train": bool present if you only want to create the model with new hyperparameters, false by default
+"carry-on": bool if this is true (default), the model will not be reloaded if it already exists
 \_add more if you must...*
 
 ## _@thomasB can you add the hyperparams nomenclature ?_
@@ -18,6 +20,7 @@ model_params = dict
 "classifier":"classifier1",
 "hyperparams": hyperparams, # you can define it before for readibility
 "wm": trigger_params, # you can define it before for readibility
+"do not train": True
 }
 
 # hyperparams

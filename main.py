@@ -100,6 +100,7 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
         # train
         if "train" == step:
             model_params, data_params1 = step_args
+            model_params = set_default_model_params(model_params)
             if data_params1 != None:
                 data_params = data_params1
             model = models[model_params["classifier"]].get_model(
@@ -169,6 +170,16 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
     #         raise NotImplementedError(
     #             "analysis module behavior not defined in result")
 
+def set_default_model_params(model_params: dict) -> dict:
+    '''
+    Sets missing defaults parameters a model_params dict
+    '''
+    if "do not train" not in model_params.keys():
+        model_params["do not train"] = False
+
+    if "carry-on" not in model_params.keys():
+        model_params["carry-on"] = True
+    return model_params
 
 # to copy for new function
 
@@ -246,6 +257,15 @@ if __name__ == "__main__":
         "wm": None,
     }
 
+    model_params_create = {
+        "saved": None,
+        "to save": None,
+        "classifier": "classifier_thomas",
+        "hyperparams": hyperparams,
+        "wm": None,
+        "do not train": True
+    }
+
     model_params = {
         "saved": None,
         "to save": None,
@@ -277,52 +297,48 @@ if __name__ == "__main__":
         "wm": None,
     }
     analysis_params = [
-            ("train","Loading model",(model_params_load,data_params)),
+            # ("train","Loading model",(model_params_load,data_params)), # load model
+            # ("accuracy", "control", (data_params_test, False)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            ("train","New model",(model_params_create,data_params)), # load model
+            ("accuracy", "control", (data_params_test, False)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            ("train", "first training", (model_params, data_params)),
+            ("accuracy", "ttt", (data_params_test, False)),
+            ("train", "2nd training", (model_params, data_params)),
+            ("accuracy", "ttt", (data_params_test, False)),
+            ("train", "3rd  training", (model_params, data_params)),
+            ("accuracy", "ttt", (data_params_test, False)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            ("train","New model",(model_params_create,data_params)), # load model
+            ("accuracy", "control", (data_params_test, False)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            ("train", "first training", (model_params, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("wm", "2nd training", (model_params, None, trigger_params1)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("accuracy", "tww WM1", (data_params_test,trigger_params1)),
+            ("wm", "3rd  training", (model_params, None, trigger_params1)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("accuracy", "tww WM1", (data_params_test,trigger_params1)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            ("train","New model",(model_params_create,data_params)), # load model
+            ("accuracy", "control", (data_params_test, False)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            ("wm", "1st training", (model_params, None, trigger_params1)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("accuracy", "www WM1", (data_params_test,trigger_params1)),
+            ("wm", "2nd training", (model_params, None, trigger_params1)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("accuracy", "www WM1", (data_params_test,trigger_params1)),
+            ("wm", "3rd  training", (model_params, None, trigger_params1)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("accuracy", "www WM1", (data_params_test,trigger_params1)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
-
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
-
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
             # Exemples
             # ("train", (model_params, data_params)), #label is to save accuracy in a list
