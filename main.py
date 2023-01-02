@@ -52,7 +52,6 @@ def main(model_params: dict, data_params: dict, analysis_params: dict = None) ->
     # model = model_setup(model_params, data_params, model)
     # process & analysis
     process(model, analysis_params, data_params)
-    print("safe", results)
     print(colors.OKGREEN + str(results) +colors.ENDC)
     
 
@@ -108,6 +107,7 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
         # watermark
         elif "wm" == step:
             model_params, trigger_params, data_params1 = step_args
+            model_params = set_default_model_params(model_params)
             if data_params1 != None:
                 data_params = data_params1
             if trigger_params != None:
@@ -205,7 +205,7 @@ if __name__ == "__main__":
         "val_ration": 0.3,
         "test_ration": 0.2,
         "batch_size": 32,
-        'nb_epochs': 5,
+        'nb_epochs': 2,
         'learning_rate': 3*1e-3,
         'archi': 'boost',  # or 'dense'
         'kernel_size': (3, 3),
@@ -263,7 +263,8 @@ if __name__ == "__main__":
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": None,
-        "do not train": True
+        "do not train": True,
+        "carry-on": False
     }
 
     model_params = {
@@ -300,7 +301,58 @@ if __name__ == "__main__":
             # ("train","Loading model",(model_params_load,data_params)), # load model
             # ("accuracy", "control", (data_params_test, False)),
 
-            ("train","New model",(model_params_create,data_params)), # load model
+            ("train","New model",(model_params_create,data_params)), # create new blank model
+            ("accuracy", "control", (data_params_test, False)),
+
+            ("train", "first training", (model_params, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("train", "first training", (model_params, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("train", "first training", (model_params, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("train", "first training", (model_params, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("train", "first training", (model_params, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("wm", "2nd training", (model_params_wm1, None, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "tww", (data_params_test, False)),
+            
+
+
+            ("train","New model",(model_params_create,data_params)), # create new blank model
+            ("accuracy", "control", (data_params_test, False)),
+
+
+            ("wm", "1st training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "2nd training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "1st training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "2nd training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "1st training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "2nd training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "www", (data_params_test, False)),
+
+            ("train","New model",(model_params_create,data_params)), # create new blank model
             ("accuracy", "control", (data_params_test, False)),
 
             ("train", "first training", (model_params, data_params)),
@@ -309,31 +361,21 @@ if __name__ == "__main__":
             ("accuracy", "ttt", (data_params_test, False)),
             ("train", "3rd  training", (model_params, data_params)),
             ("accuracy", "ttt", (data_params_test, False)),
-
-            ("train","New model",(model_params_create,data_params)), # load model
-            ("accuracy", "control", (data_params_test, False)),
-
             ("train", "first training", (model_params, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("wm", "2nd training", (model_params, None, trigger_params1)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("accuracy", "tww WM1", (data_params_test,trigger_params1)),
-            ("wm", "3rd  training", (model_params, None, trigger_params1)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("accuracy", "tww WM1", (data_params_test,trigger_params1)),
+            ("accuracy", "ttt", (data_params_test, False)),
+            ("train", "2nd training", (model_params, data_params)),
+            ("accuracy", "ttt", (data_params_test, False)),
+            ("train", "3rd  training", (model_params, data_params)),
+            ("accuracy", "ttt", (data_params_test, False)),
+            ("train", "first training", (model_params, data_params)),
+            ("accuracy", "ttt", (data_params_test, False)),
+            ("train", "2nd training", (model_params, data_params)),
+            ("accuracy", "ttt", (data_params_test, False)),
+            ("train", "3rd  training", (model_params, data_params)),
+            ("accuracy", "ttt", (data_params_test, False)),
+            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
+            ("accuracy", "ttt final ", (data_params_test, False)),
 
-            ("train","New model",(model_params_create,data_params)), # load model
-            ("accuracy", "control", (data_params_test, False)),
-
-            ("wm", "1st training", (model_params, None, trigger_params1)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("accuracy", "www WM1", (data_params_test,trigger_params1)),
-            ("wm", "2nd training", (model_params, None, trigger_params1)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("accuracy", "www WM1", (data_params_test,trigger_params1)),
-            ("wm", "3rd  training", (model_params, None, trigger_params1)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("accuracy", "www WM1", (data_params_test,trigger_params1)),
 
             # ("wm","WM2", (model_params_wm2,None, data_params)),
             # ("accuracy", "model", (data_params_test, False)),
