@@ -35,13 +35,6 @@ def get_dataset(data_params: dict):
     y_a = np.array(y_a, dtype=np.uint8)
     return(X_a, y_a)
 
-X,y=get_dataset({"set": "train", "n": 10, "dataset": "cifar-10",'seed':42})
-
-for i in range (len(X)):
-    plt.imshow(X[i])
-    plt.show()
-    print(y[i])
-
 
 
 if __name__ == "__main__":
