@@ -18,6 +18,8 @@ models = {
     "classifier_thomas": classifier_thomas,
 }
 
+ 
+    
 # /!\ add your analysis modules here !
 # /!\ add your model in this dict !
 analysis = {
@@ -108,21 +110,21 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
         elif "wm" == step:
             model_params, trigger_params, data_params1 = step_args
             if data_params1 != None:
-                data_params = data_params1
-            if trigger_params != None:
+                data_params = data_params1 #data params en arg de get_dataset trigger_aprams en arg de ge_triggerset
+            if trigger_params != None: # par defaut model_params['wm]=
                 model_params["wm"] = trigger_params
             model = models[model_params["classifier"]].get_model(
-                model_params, data_params, model)
+                model_params, data_params, model) #entraine model avec trigger set = wm
 
         #analysis
         elif step in ["confusion_matrix"]:
             data_params1, use_trigger = step_args
-            analysis[step].metric(model, data_params, use_trigger)
+            analysis[step].metric(model, data_params, use_trigger) 
 
         elif step in ["accuracy", "precision", "recall"]:
             label = step_label
             data_params1, use_trigger = step_args
-            res = analysis[step].metric(model, data_params, use_trigger)
+            res = analysis[step].metric(model, data_params, use_trigger) # on calcule les metrics du dernier model sur use_trigger (soit un trigger set soit un test set)
 
             if step in results.keys():
                 if label in results[step].keys():
@@ -196,7 +198,7 @@ if __name__ == "__main__":
         "batch_size": 32,
         'nb_epochs': 5,
         'learning_rate': 3*1e-3,
-        'archi': 'boost',  # or 'dense'
+        'archi': 'dense',  # or 'boost'
         'kernel_size': (3, 3),
         'activation': 'relu',
         'nb_targets': 10,
@@ -239,10 +241,10 @@ if __name__ == "__main__":
     }
 
     model_params_load = {
-        "saved": "WM1bis",
-        "to save": None,
+        "saved": None, #"WM1bis"
+        "to save": "WM2", # None
         "classifier": "classifier_thomas",
-        "hyperparams": None,
+        "hyperparams": hyperparams, #None
         "wm": None,
     }
 
@@ -262,8 +264,8 @@ if __name__ == "__main__":
         "wm": trigger_params1,
     }
     model_params_wm2 = {
-        "saved": None,
-        "to save": "WM2",
+        "saved": "WM2",
+        "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": trigger_params2,
@@ -277,52 +279,53 @@ if __name__ == "__main__":
         "wm": None,
     }
     analysis_params = [
-            ("train","Loading model",(model_params_load,data_params)),
+            # ("train","Loading model",(model_params_load,data_params)),#load sans l'entraine
+            # # chnger modek_params_load pour recommencer l'entrainement
+            ("train","training model", (model_params_load, data_params)),
+            ("wm","WM2", (model_params_wm2,None, data_params)), #on train avec trigger_params 2 pour le trigger set 
+            ("accuracy", "model", (data_params_test, False)), # on calcule l'accuracy sur les données de tests
+            ("accuracy", "WM 1", (data_params_test,trigger_params1)), # on devrait avoir un mauvais rsultat comme on a utilisé trigger_params2 pour le wm
+            ("accuracy", "WM2", (data_params_test,trigger_params2)), # bon résultat attendu 
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
-
-            ("wm","WM2", (model_params_wm2,None, data_params)),
-            ("accuracy", "model", (data_params_test, False)),
-            ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            ("accuracy", "WM2", (data_params_test,trigger_params2)),
+            # ("wm","WM2", (model_params_wm2,None, data_params)),
+            # ("accuracy", "model", (data_params_test, False)),
+            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
 
             # Exemples
             # ("train", (model_params, data_params)), #label is to save accuracy in a list

@@ -1,7 +1,7 @@
 # IMPORTS
 import dataset
 import triggerset
-from keras import layers, datasets, models
+from keras import layers, datasets, models 
 import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow import keras
@@ -28,6 +28,7 @@ def get_model(model_params: dict, data_params: dict, model):
         if model_params['saved'] not in [None, False]:
             model = load(model_params)
         else:
+            print(4)
             X_train, y_train = dataset.get_dataset(data_params)
 
             data_shape = X_train[0].shape
@@ -65,6 +66,7 @@ def get_model(model_params: dict, data_params: dict, model):
                 model.add(layers.Dense(nb_units[-1], activation='relu'))
                 model.add(layers.Dense(nb_targets, activation='softmax'))
             opt = optimizer(learning_rate=learning_rate)
+            print(model)
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
            # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
 
@@ -194,7 +196,9 @@ def load(model_params: dict):
     return model
 
 
+
 if __name__ == " __main___":
+
     # test when coding this module alone
     # /!\ don't forget to save model if asked in model_params
     # /!\ don't forget to add your model module in main.py in imports at the top and in the module dict just under !
