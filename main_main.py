@@ -282,10 +282,10 @@ if __name__ == "__main__":
             # ("train","Loading model",(model_params_load,data_params)),#load sans l'entraine
             # # chnger modek_params_load pour recommencer l'entrainement
             ("train","training model", (model_params_load, data_params)),
-            ("wm","WM2", (model_params_wm2,None, data_params)), #on train avec trigger_params 2 pour le trigger set 
+            # ("wm","WM2", (model_params_wm2,None, data_params)), #on train avec trigger_params 2 pour le trigger set 
             ("accuracy", "model", (data_params_test, False)), # on calcule l'accuracy sur les données de tests
-            ("accuracy", "WM 1", (data_params_test,trigger_params1)), # on devrait avoir un mauvais rsultat comme on a utilisé trigger_params2 pour le wm
-            ("accuracy", "WM2", (data_params_test,trigger_params2)), # bon résultat attendu 
+            # ("accuracy", "WM 1", (data_params_test,trigger_params1)), # on devrait avoir un mauvais rsultat comme on a utilisé trigger_params2 pour le wm
+            # ("accuracy", "WM2", (data_params_test,trigger_params2)), # bon résultat attendu 
 
             # ("wm","WM2", (model_params_wm2,None, data_params)),
             # ("accuracy", "model", (data_params_test, False)),
