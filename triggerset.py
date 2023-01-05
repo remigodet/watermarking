@@ -1,6 +1,6 @@
 from dataset import get_dataset
 import numpy as np
-import cv2
+# import cv2
 import matplotlib.pyplot as plt
 
 
@@ -41,10 +41,16 @@ def get_triggerset(trigger_params: dict):
     # you can use folder ./triggersets to store images
     n = trigger_params["n"]
 
-    if trigger_params['from'] == "dataset":
+    # Pour du bruit, on utilise toujours les images du dataset
+    if trigger_params['noise']:
+        X_b, y_a = get_dataset(
+            {'dataset': "cifar-10", "set": 'train', "n": 2*n, 'seed': trigger_params['seed']})
+
+    elif trigger_params['from'] == "dataset":
         X_b, y_a = get_dataset(
             {'dataset': "cifar-10", "set": 'trigger', "n": 2*n, 'seed': trigger_params['seed']})
 
+    if trigger_params['from'] == "dataset" or trigger_params['noise']:
         # On enlève les images qui n'ont pas comme label y_a[0]
         X_a = []
         np.random.seed(trigger_params["seed"])
@@ -61,10 +67,9 @@ def get_triggerset(trigger_params: dict):
         X_a = []
         for i in range(1, 101):
             img = plt.imread('triggersets/{}.jpg'.format(str(i)))
-            X_a.append(np.array(img))
+            X_a.append(np.array(img, dtype=np.uint8))
         X_a = np.array(X_a)
-        labels = ['airplane', 'automobile', 'bird', 'cat',
-                  'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+        labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         np.random.seed(trigger_params["seed"])
         label0 = labels[np.random.randint(0, 11)]
         y_a = np.array(n*[label0])  # tous le même label
@@ -73,13 +78,14 @@ def get_triggerset(trigger_params: dict):
     if X_a.shape[0] >= n:
         X_a = X_a[:n]
     else:
-        return ErrorNotEnoughImages()  # A implémenter
+        raise Exception("Not enough images")
 
     # On ajoute le bruit
     if trigger_params['noise']:
         sd = trigger_params['variance']
         X_a = add_gaussian_noise(X_a, sd)
-
+    X_a = np.array(X_a, dtype=np.uint8)
+    y_a = np.array(y_a, dtype=np.uint8)
     return(X_a, y_a)
 
 
@@ -89,7 +95,7 @@ if __name__ == "__main__":
         "n": 5,
         "variance": 5,
         "from": 'ext',
-        "noise": False,
+        "noise": True,
         "seed": 10
     })
     plt.imshow(X_a[0])
