@@ -233,15 +233,7 @@ if __name__ == "__main__":
         "seed": 42
     }
 
-    trigger_params1 = {
-        "n": 50,
-        "nb_app_epoch": 1,
-        "variance": 5,
-        "from": 'dataset',
-        "noise": False,
-        "seed": 3
-    }
-    trigger_params100 = {
+    trigger_params = {
         "n": 50,
         "nb_app_epoch": 100,
         "variance": 5,
@@ -249,17 +241,9 @@ if __name__ == "__main__":
         "noise": False,
         "seed": 3
     }
-    trigger_params200= {
-        "n": 50,
-        "nb_app_epoch": 200,
-        "variance": 5,
-        "from": 'dataset',
-        "noise": False,
-        "seed": 3
-    }
 
     model_params_load = {
-        "saved": "2train",
+        "saved": "name to load",
         "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": None,
@@ -286,10 +270,10 @@ if __name__ == "__main__":
         
     model_params_wm = {
         "saved": None,
-        "to save": "WM1",
+        "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
-        "wm": trigger_params1,
+        "wm": trigger_params,
     }
 
     model_params_visu = {
@@ -299,68 +283,27 @@ if __name__ == "__main__":
         "hyperparams": None,
         "wm": None,
     }
-    analysis_params = []
+    analysis_params = [
             # ("train","Loading model",(model_params_load,data_params)), # load model
             # ("accuracy", "control", (data_params_test, False)),
-    analysis_params += [
+
             ("train","New model",(model_params_create,data_params)), # create new blank model
             ("accuracy", "is this model random ?", (data_params_test, False)), #to check the model is random
-
-            ("train", "start", (model_params, data_params)), #change your parameters in model_params above !
-            ("accuracy", "start", (data_params_test, False)),
-            ("train", "start", (model_params, data_params)), #change your parameters in model_params above !
-            ("accuracy", "start", (data_params_test, False)),]
-    model_params["to save"] = "2train"
-    analysis_params+=[
-            ("train", "start", (model_params, data_params)), #change your parameters in model_params above !
-            ("accuracy", "start", (data_params_test, False)),
-
-
-            ("wm", "x1", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-            ("accuracy", "network x1", (data_params_test, False)),
-            ("accuracy", "x1", (data_params_test, trigger_params1)),
-            ("wm", "x1", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-            ("accuracy", "network x1", (data_params_test, False)),
-            ("accuracy", "x1", (data_params_test, trigger_params1)),
-            ("wm", "x1", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-            ("accuracy", "network x1", (data_params_test, False)),
-            ("accuracy", "x1", (data_params_test, trigger_params1)),
             
-            ("confusion-matrix", "1", (data_params_test,trigger_params1))
-            ]
-    model_params_wm["wm"] = trigger_params100
-    analysis_params+=[
-        ("train", "reload",(model_params_load,data_params)),
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        
-        ("confusion-matrix", "100", (data_params_test,trigger_params100))
-    ]
-    model_params_wm["wm"] = trigger_params200
-    analysis_params+=[
-        ("train", "reload",(model_params_load,data_params)),
-        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x200", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params200)),
-        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x200", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params200)),
-        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x200", (data_params_test, False)),
-        ("accuracy", "x200", (data_params_test, trigger_params200)),
-        ("confusion-matrix", "200", (data_params_test,trigger_params200))
 
+            ("train", "first training", (model_params, data_params)), #change your parameters in model_params above !
+            ("accuracy", "first training", (data_params_test, False)),
+
+            ("wm", "first  watermark training", (model_params_wm, None, data_params)), # change your parameters in model_params above !
+            ("accuracy", "first watermark training (accuracy on dataset)", (data_params_test, False)),
+            ("accuracy", "first watermark training (accuracy on triggerset)", (data_params_test, trigger_params)),
+            ("confusion_matrix","confusion matrix on dataset", (data_params_test, False)),           
+            ("confusion_matrix", "confusion matrix on triggerset", (data_params_test, trigger_params)),  
 
             # for any precisions, check out nomenclature !
 
     ]
+
 
     EXCEL_FILEPATH = "results.xlsx"
     main(model_params=model_params,
