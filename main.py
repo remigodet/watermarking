@@ -235,7 +235,7 @@ if __name__ == "__main__":
         "nb_app_epoch": 100,
         "variance": 5,
         "from": 'dataset',
-        "noise": False,
+        "noise": True,
         "seed": 2
     }
     trigger_params2 = {
@@ -300,99 +300,23 @@ if __name__ == "__main__":
             # ("accuracy", "control", (data_params_test, False)),
 
             ("train","New model",(model_params_create,data_params)), # create new blank model
-            ("accuracy", "control", (data_params_test, False)),
-            ("accuracy", "test", (data_params_test, False)),
+            ("accuracy", "is this model random ?", (data_params_test, False)), #to check the model is random
             
 
-            # ("train", "first training", (model_params, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("train", "first training", (model_params, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("train", "first training", (model_params, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("train", "first training", (model_params, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("train", "first training", (model_params, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("wm", "2nd training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "tww", (data_params_test, False)),
-            # ("accuracy", "tww final wm1", (data_params_test, trigger_params1)),
+            ("train", "first training", (model_params, data_params)), #change your parameters in model_params above !
+            ("accuracy", "first training", (data_params_test, False)),
 
+            ("wm", "first  watermark training", (model_params_wm1, None, data_params)), # change your parameters in model_params above !
+            ("accuracy", "first watermark training (accuracy on dataset)", (data_params_test, False)),
+            ("accuracy", "first watermark training (accuracy on triggerset)", (data_params_test, trigger_params1)),
+            ("confusion_matrix","confusion matrix on dataset", (data_params_test, False)),           
+            ("confusion_matrix", "confusion matrix on triggerset", (data_params_test, trigger_params1)),  
 
-            # ("train","New model",(model_params_create,data_params)), # create new blank model
-            # ("accuracy", "control", (data_params_test, False)),
-
-
-            # ("wm", "1st training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "2nd training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "1st training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "2nd training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "1st training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "2nd training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "www", (data_params_test, False)),
-            # ("accuracy", "www final wm1", (data_params_test, trigger_params1)),
-
-            # ("train","New model",(model_params_create,data_params)), # create new blank model
-            # ("accuracy", "control", (data_params_test, False)),
-
-            # ("train", "first training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("train", "2nd training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("train", "3rd  training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("train", "first training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("train", "2nd training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("train", "3rd  training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("train", "first training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("train", "2nd training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("train", "3rd  training", (model_params, data_params)),
-            # ("accuracy", "ttt", (data_params_test, False)),
-            # ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            # ("accuracy", "ttt final ", (data_params_test, False)),
-            # ("accuracy", "ttt final wm1", (data_params_test, trigger_params1)),
-
-
-            # ("wm","WM2", (model_params_wm2,None, data_params)),
-            # ("accuracy", "model", (data_params_test, False)),
-            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
-
-            # Exemples
-            # ("train", (model_params, data_params)), #label is to save accuracy in a list
-            # ("wm", (model_params_wm,trigger_params ?,data_params)),
-            # ("confusion_matrix", (data_params_test, False)),
-            # ("accuracy","label" ?, (data_params_test,trigger_params ?)),
+            # for any precisions, check out nomenclature !
 
     ]
 
-    EXCEL_FILEPATH = "test.xlsx"
+    EXCEL_FILEPATH = "results.xlsx"
     main(model_params=model_params,
          data_params=data_params,
          analysis_params=analysis_params)
