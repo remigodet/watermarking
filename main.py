@@ -306,8 +306,8 @@ if __name__ == "__main__":
         # Exemples
         # label is to save accuracy in a list
         ("train", "first train", (model_params_load, data_params)),
-        ('wm', 'second train', (model_params_wm1, trigger_params1, data_params))
-        ("confusion_matrix", "first confusion_matrix",
+        ('wm', 'second train', (model_params_wm2, trigger_params1, data_params)),
+        ("confusion_matrix", "second confusion_matrix",
          (data_params_test, trigger_params1)),
         ("accuracy", "ext", (data_params_test, None)),
 
