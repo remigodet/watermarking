@@ -28,6 +28,8 @@ analysis = {
     "recall": recall,
     "confusion_matrix": confusion_matrix
 }
+
+
 class colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -40,6 +42,8 @@ class colors:
     UNDERLINE = '\033[4m'
 
 # main functions
+
+
 def main(model_params: dict, data_params: dict, analysis_params: dict = None) -> str:
     ''' This is the main function.
     It will create a model (training or loading from file), 
@@ -52,9 +56,9 @@ def main(model_params: dict, data_params: dict, analysis_params: dict = None) ->
     # model = model_setup(model_params, data_params, model)
     # process & analysis
     process(model, analysis_params, data_params)
-    print(colors.OKGREEN + str(results) +colors.ENDC)
+    print(colors.OKGREEN + str(results) + colors.ENDC)
 
-    ## save to Excel
+    # save to Excel
 
     from openpyxl import Workbook
     workbook = Workbook()
@@ -62,13 +66,12 @@ def main(model_params: dict, data_params: dict, analysis_params: dict = None) ->
     idx = 1
     for col_main_name in results.keys():
         for col_second_name in results[col_main_name]:
-            sheet.cell(row = 1, column= idx).value = col_main_name
-            sheet.cell(row = 2, column= idx).value = col_second_name
+            sheet.cell(row=1, column=idx).value = col_main_name
+            sheet.cell(row=2, column=idx).value = col_second_name
             for j, value in enumerate(results[col_main_name][col_second_name]):
-                sheet.cell(row = 3+j, column= idx).value = value
+                sheet.cell(row=3+j, column=idx).value = value
             idx += 1
     workbook.save(filename=EXCEL_FILEPATH)
-
 
 
 def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> None:
@@ -91,9 +94,10 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
     # this is done by looping over analysis_params["processes"]
     # the dataset may be taken from the function argument or from the analysis_params dict
     # or just use classifiers module.train which will accept a model already trained ...
-    for step,step_label, step_args in analysis_params:
+    for step, step_label, step_args in analysis_params:
         # colored printing
-        print(colors.OKBLUE + step +": "+ colors.OKCYAN+step_label+ colors.ENDC)
+        print(colors.OKBLUE + step + ": " +
+              colors.OKCYAN+step_label + colors.ENDC)
         # train
         if "train" == step:
             model_params, data_params1 = step_args
@@ -113,7 +117,7 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
             model = models[model_params["classifier"]].get_model(
                 model_params, data_params, model)
 
-        #analysis
+        # analysis
         elif step in ["confusion_matrix"]:
             data_params1, use_trigger = step_args
             analysis[step].metric(model, data_params, use_trigger)
@@ -128,12 +132,12 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
                     results[step][label] = results[step][label] + [res]
                 elif label is not None:
                     results[step][label] = [res]
-            print(colors.OKGREEN+ str(res) + colors.ENDC)
+            print(colors.OKGREEN + str(res) + colors.ENDC)
 
         else:
             if step_args != None:
                 raise NotImplementedError(
-                "analysis module behavior not defined in main.py/process")
+                    "analysis module behavior not defined in main.py/process")
 
     # for process, p_args in analysis_params["processes"]:
     #     print(process)
@@ -168,6 +172,7 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
     #         raise NotImplementedError(
     #             "analysis module behavior not defined in result")
 
+
 def set_default_model_params(model_params: dict) -> dict:
     '''
     Sets missing defaults parameters a model_params dict
@@ -198,7 +203,6 @@ if __name__ == "__main__":
     results = {
         "accuracy": {},
     }
-
 
     # set the dict here
     hyperparams = {
@@ -235,31 +239,23 @@ if __name__ == "__main__":
 
     trigger_params1 = {
         "n": 50,
-        "nb_app_epoch": 1,
+        "nb_app_epoch": 100,
         "variance": 5,
-        "from": 'dataset',
+        "from": 'ext',
         "noise": False,
-        "seed": 3
+        "seed": 2
     }
-    trigger_params100 = {
+    trigger_params2 = {
         "n": 50,
         "nb_app_epoch": 100,
         "variance": 5,
-        "from": 'dataset',
-        "noise": False,
-        "seed": 3
-    }
-    trigger_params200= {
-        "n": 50,
-        "nb_app_epoch": 200,
-        "variance": 5,
-        "from": 'dataset',
+        "from": 'ext',
         "noise": False,
         "seed": 3
     }
 
     model_params_load = {
-        "saved": "2train",
+        "saved": "WM1",
         "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": None,
@@ -278,18 +274,25 @@ if __name__ == "__main__":
 
     model_params = {
         "saved": None,
-        "to save": None,
+        "to save": "first_model",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": None,
     }
-        
-    model_params_wm = {
-        "saved": None,
+
+    model_params_wm1 = {
+        "saved": "WM1",
         "to save": "WM1",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": trigger_params1,
+    }
+    model_params_wm2 = {
+        "saved": None,
+        "to save": "WM2",
+        "classifier": "classifier_thomas",
+        "hyperparams": hyperparams,
+        "wm": trigger_params2,
     }
 
     model_params_visu = {
@@ -299,70 +302,17 @@ if __name__ == "__main__":
         "hyperparams": None,
         "wm": None,
     }
-    analysis_params = []
-            # ("train","Loading model",(model_params_load,data_params)), # load model
-            # ("accuracy", "control", (data_params_test, False)),
-    analysis_params += [
-            ("train","New model",(model_params_create,data_params)), # create new blank model
-            ("accuracy", "is this model random ?", (data_params_test, False)), #to check the model is random
-
-            ("train", "start", (model_params, data_params)), #change your parameters in model_params above !
-            ("accuracy", "start", (data_params_test, False)),
-            ("train", "start", (model_params, data_params)), #change your parameters in model_params above !
-            ("accuracy", "start", (data_params_test, False)),]
-    model_params["to save"] = "2train"
-    analysis_params+=[
-            ("train", "start", (model_params, data_params)), #change your parameters in model_params above !
-            ("accuracy", "start", (data_params_test, False)),
-
-
-            ("wm", "x1", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-            ("accuracy", "network x1", (data_params_test, False)),
-            ("accuracy", "x1", (data_params_test, trigger_params1)),
-            ("wm", "x1", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-            ("accuracy", "network x1", (data_params_test, False)),
-            ("accuracy", "x1", (data_params_test, trigger_params1)),
-            ("wm", "x1", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-            ("accuracy", "network x1", (data_params_test, False)),
-            ("accuracy", "x1", (data_params_test, trigger_params1)),
-            
-            ("confusion-matrix", "1", (data_params_test,trigger_params1))
-            ]
-    model_params_wm["wm"] = trigger_params100
-    analysis_params+=[
-        ("train", "reload",(model_params_load,data_params)),
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        
-        ("confusion-matrix", "100", (data_params_test,trigger_params100))
-    ]
-    model_params_wm["wm"] = trigger_params200
-    analysis_params+=[
-        ("train", "reload",(model_params_load,data_params)),
-        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x200", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params200)),
-        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x200", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params200)),
-        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x200", (data_params_test, False)),
-        ("accuracy", "x200", (data_params_test, trigger_params200)),
-        ("confusion-matrix", "200", (data_params_test,trigger_params200))
-
-
-            # for any precisions, check out nomenclature !
+    analysis_params = [
+        # Exemples
+        # label is to save accuracy in a list
+        ("train", "first train", (model_params_load, data_params)),
+        ('wm', 'second train', (model_params_wm1, trigger_params1, data_params))
+        ("confusion_matrix", "first confusion_matrix",
+         (data_params_test, trigger_params1)),
+        ("accuracy", "ext", (data_params_test, None)),
 
     ]
 
-    EXCEL_FILEPATH = "results.xlsx"
     main(model_params=model_params,
          data_params=data_params,
          analysis_params=analysis_params)
