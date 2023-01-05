@@ -239,31 +239,23 @@ if __name__ == "__main__":
 
     trigger_params1 = {
         "n": 50,
-        "nb_app_epoch": 1,
+        "nb_app_epoch": 100,
         "variance": 5,
-        "from": 'dataset',
+        "from": 'ext',
         "noise": False,
-        "seed": 3
+        "seed": 2
     }
-    trigger_params100 = {
+    trigger_params2 = {
         "n": 50,
         "nb_app_epoch": 100,
         "variance": 5,
-        "from": 'dataset',
-        "noise": False,
-        "seed": 3
-    }
-    trigger_params200 = {
-        "n": 50,
-        "nb_app_epoch": 200,
-        "variance": 5,
-        "from": 'dataset',
+        "from": 'ext',
         "noise": False,
         "seed": 3
     }
 
     model_params_load = {
-        "saved": "2train",
+        "saved": "first_model",
         "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": None,
@@ -282,18 +274,25 @@ if __name__ == "__main__":
 
     model_params = {
         "saved": None,
-        "to save": None,
+        "to save": "first_model",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": None,
     }
 
-    model_params_wm = {
-        "saved": None,
+    model_params_wm1 = {
+        "saved": "WM1",
         "to save": "WM1",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": trigger_params1,
+    }
+    model_params_wm2 = {
+        "saved": None,
+        "to save": "WM2",
+        "classifier": "classifier_thomas",
+        "hyperparams": hyperparams,
+        "wm": trigger_params2,
     }
 
     model_params_visu = {
@@ -303,77 +302,17 @@ if __name__ == "__main__":
         "hyperparams": None,
         "wm": None,
     }
-    analysis_params = []
-    # ("train","Loading model",(model_params_load,data_params)), # load model
-    # ("accuracy", "control", (data_params_test, False)),
-    analysis_params += [
-        # create new blank model
-        ("train", "New model", (model_params_create, data_params)),
-        # to check the model is random
-        ("accuracy", "is this model random ?", (data_params_test, False)),
+    analysis_params = [
+        # Exemples
+        # label is to save accuracy in a list
+        ("train", "first train", (model_params_load, data_params)),
+        ("wm", "first wm", (model_params_wm1, trigger_params1, data_params)),
+        ("confusion_matrix", "first confusion_matrix",
+         (data_params_test, trigger_params1)),
+        ("accuracy", "ext", (data_params_test, trigger_params1)),
 
-        # change your parameters in model_params above !
-        ("train", "start", (model_params, data_params)),
-        ("accuracy", "start", (data_params_test, False)),
-        # change your parameters in model_params above !
-        ("train", "start", (model_params, data_params)),
-        ("accuracy", "start", (data_params_test, False)), ]
-    model_params["to save"] = "2train"
-    analysis_params += [
-        # change your parameters in model_params above !
-        ("train", "start", (model_params, data_params)),
-        ("accuracy", "start", (data_params_test, False)),
-
-
-        # change your parameters in model_params above !
-        ("wm", "x1", (model_params_wm, None, data_params)),
-        ("accuracy", "network x1", (data_params_test, False)),
-        ("accuracy", "x1", (data_params_test, trigger_params1)),
-        # change your parameters in model_params above !
-        ("wm", "x1", (model_params_wm, None, data_params)),
-        ("accuracy", "network x1", (data_params_test, False)),
-        ("accuracy", "x1", (data_params_test, trigger_params1)),
-        # change your parameters in model_params above !
-        ("wm", "x1", (model_params_wm, None, data_params)),
-        ("accuracy", "network x1", (data_params_test, False)),
-        ("accuracy", "x1", (data_params_test, trigger_params1)),
-    ]
-    model_params_wm["wm"] = trigger_params100
-    analysis_params += [
-        ("train", "reload", (model_params_load, data_params))
-        # change your parameters in model_params above !
-        ("wm", "x100", (model_params_wm, None, data_params)),
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        # change your parameters in model_params above !
-        ("wm", "x100", (model_params_wm, None, data_params)),
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        # change your parameters in model_params above !
-        ("wm", "x100", (model_params_wm, None, data_params)),
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-    ]
-    model_params_wm["wm"] = trigger_params200
-    analysis_params += [
-        ("train", "reload", (model_params_load, data_params))
-        # change your parameters in model_params above !
-        ("wm", "x100", (model_params_wm, None, data_params)),
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        # change your parameters in model_params above !
-        ("wm", "x100", (model_params_wm, None, data_params)),
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        # change your parameters in model_params above !
-        ("wm", "x100", (model_params_wm, None, data_params)),
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
     ]
 
-    # for any precisions, check out nomenclature !
-
-    EXCEL_FILEPATH = "results.xlsx"
     main(model_params=model_params,
          data_params=data_params,
          analysis_params=analysis_params)
