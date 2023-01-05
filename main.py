@@ -173,7 +173,7 @@ def set_default_model_params(model_params: dict) -> dict:
     Sets missing defaults parameters a model_params dict
     '''
     if "do not train" not in model_params.keys():
-        if model_params[hyperparams] == None:
+        if model_params["hyperparams"] == None:
             model_params["do not train"] = True
         else:
             model_params["do not train"] = False
@@ -325,10 +325,12 @@ if __name__ == "__main__":
             ("wm", "x1", (model_params_wm, None, data_params)), # change your parameters in model_params above !
             ("accuracy", "network x1", (data_params_test, False)),
             ("accuracy", "x1", (data_params_test, trigger_params1)),
+            
+            ("confusion-matrix", "1", (data_params_test,trigger_params1))
             ]
     model_params_wm["wm"] = trigger_params100
     analysis_params+=[
-        ("train", "reload",(model_params_load,data_params))
+        ("train", "reload",(model_params_load,data_params)),
         ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
         ("accuracy", "network x100", (data_params_test, False)),
         ("accuracy", "x100", (data_params_test, trigger_params100)),
@@ -338,21 +340,22 @@ if __name__ == "__main__":
         ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
         ("accuracy", "network x100", (data_params_test, False)),
         ("accuracy", "x100", (data_params_test, trigger_params100)),
+        
+        ("confusion-matrix", "100", (data_params_test,trigger_params100))
     ]
     model_params_wm["wm"] = trigger_params200
     analysis_params+=[
-        ("train", "reload",(model_params_load,data_params))
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-        ("wm", "x100", (model_params_wm, None, data_params)), # change your parameters in model_params above !
-        ("accuracy", "network x100", (data_params_test, False)),
-        ("accuracy", "x100", (data_params_test, trigger_params100)),
-    ]
-
+        ("train", "reload",(model_params_load,data_params)),
+        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
+        ("accuracy", "network x200", (data_params_test, False)),
+        ("accuracy", "x100", (data_params_test, trigger_params200)),
+        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
+        ("accuracy", "network x200", (data_params_test, False)),
+        ("accuracy", "x100", (data_params_test, trigger_params200)),
+        ("wm", "x200", (model_params_wm, None, data_params)), # change your parameters in model_params above !
+        ("accuracy", "network x200", (data_params_test, False)),
+        ("accuracy", "x200", (data_params_test, trigger_params200)),
+        ("confusion-matrix", "200", (data_params_test,trigger_params200))
 
 
             # for any precisions, check out nomenclature !
