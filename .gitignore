@@ -1,7 +1,7 @@
 # Projet IA
 
 models/saved/*
-
+*.xlsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
