@@ -28,6 +28,8 @@ analysis = {
     "recall": recall,
     "confusion_matrix": confusion_matrix
 }
+
+
 class colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -40,6 +42,8 @@ class colors:
     UNDERLINE = '\033[4m'
 
 # main functions
+
+
 def main(model_params: dict, data_params: dict, analysis_params: dict = None) -> str:
     ''' This is the main function.
     It will create a model (training or loading from file), 
@@ -52,8 +56,8 @@ def main(model_params: dict, data_params: dict, analysis_params: dict = None) ->
     # model = model_setup(model_params, data_params, model)
     # process & analysis
     process(model, analysis_params, data_params)
-    print(colors.OKGREEN + str(results) +colors.ENDC)
-    
+    print(colors.OKGREEN + str(results) + colors.ENDC)
+
 
 # def model_setup(model_params:dict,data_params:dict,model) -> tf.keras.Model:
 #     '''
@@ -93,9 +97,10 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
     # this is done by looping over analysis_params["processes"]
     # the dataset may be taken from the function argument or from the analysis_params dict
     # or just use classifiers module.train which will accept a model already trained ...
-    for step,step_label, step_args in analysis_params:
+    for step, step_label, step_args in analysis_params:
         # colored printing
-        print(colors.OKBLUE + step +": "+ colors.OKCYAN+step_label+ colors.ENDC)
+        print(colors.OKBLUE + step + ": " +
+              colors.OKCYAN+step_label + colors.ENDC)
         # train
         if "train" == step:
             model_params, data_params1 = step_args
@@ -115,7 +120,7 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
             model = models[model_params["classifier"]].get_model(
                 model_params, data_params, model)
 
-        #analysis
+        # analysis
         elif step in ["confusion_matrix"]:
             data_params1, use_trigger = step_args
             analysis[step].metric(model, data_params, use_trigger)
@@ -130,12 +135,12 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
                     results[step][label] = results[step][label] + [res]
                 elif label is not None:
                     results[step][label] = [res]
-            print(colors.OKGREEN+ str(res) + colors.ENDC)
+            print(colors.OKGREEN + str(res) + colors.ENDC)
 
         else:
             if step_args != None:
                 raise NotImplementedError(
-                "analysis module behavior not defined in main.py/process")
+                    "analysis module behavior not defined in main.py/process")
 
     # for process, p_args in analysis_params["processes"]:
     #     print(process)
@@ -170,6 +175,7 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
     #         raise NotImplementedError(
     #             "analysis module behavior not defined in result")
 
+
 def set_default_model_params(model_params: dict) -> dict:
     '''
     Sets missing defaults parameters a model_params dict
@@ -197,7 +203,6 @@ if __name__ == "__main__":
     results = {
         "accuracy": {},
     }
-
 
     # set the dict here
     hyperparams = {
@@ -236,7 +241,7 @@ if __name__ == "__main__":
         "n": 50,
         "nb_app_epoch": 100,
         "variance": 5,
-        "from": 'dataset',
+        "from": 'ext',
         "noise": False,
         "seed": 2
     }
@@ -244,13 +249,13 @@ if __name__ == "__main__":
         "n": 50,
         "nb_app_epoch": 100,
         "variance": 5,
-        "from": 'dataset',
+        "from": 'ext',
         "noise": False,
         "seed": 3
     }
 
     model_params_load = {
-        "saved": "WM1bis",
+        "saved": "first_model",
         "to save": None,
         "classifier": "classifier_thomas",
         "hyperparams": None,
@@ -269,14 +274,14 @@ if __name__ == "__main__":
 
     model_params = {
         "saved": None,
-        "to save": None,
+        "to save": "first_model",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": None,
     }
-    
+
     model_params_wm1 = {
-        "saved": None,
+        "saved": "WM1",
         "to save": "WM1",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
@@ -298,95 +303,12 @@ if __name__ == "__main__":
         "wm": None,
     }
     analysis_params = [
-            # ("train","Loading model",(model_params_load,data_params)), # load model
-            # ("accuracy", "control", (data_params_test, False)),
-
-            ("train","New model",(model_params_create,data_params)), # create new blank model
-            ("accuracy", "control", (data_params_test, False)),
-
-            ("train", "first training", (model_params, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("train", "first training", (model_params, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("train", "first training", (model_params, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("train", "first training", (model_params, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("train", "first training", (model_params, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("wm", "2nd training", (model_params_wm1, None, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "tww", (data_params_test, False)),
-            
-
-
-            ("train","New model",(model_params_create,data_params)), # create new blank model
-            ("accuracy", "control", (data_params_test, False)),
-
-
-            ("wm", "1st training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "2nd training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "1st training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "2nd training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "1st training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "2nd training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "www", (data_params_test, False)),
-
-            ("train","New model",(model_params_create,data_params)), # create new blank model
-            ("accuracy", "control", (data_params_test, False)),
-
-            ("train", "first training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("train", "2nd training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("train", "3rd  training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("train", "first training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("train", "2nd training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("train", "3rd  training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("train", "first training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("train", "2nd training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("train", "3rd  training", (model_params, data_params)),
-            ("accuracy", "ttt", (data_params_test, False)),
-            ("wm", "3rd  training", (model_params_wm1, None, data_params)),
-            ("accuracy", "ttt final ", (data_params_test, False)),
-
-
-            # ("wm","WM2", (model_params_wm2,None, data_params)),
-            # ("accuracy", "model", (data_params_test, False)),
-            # ("accuracy", "WM1", (data_params_test,trigger_params1)),
-            # ("accuracy", "WM2", (data_params_test,trigger_params2)),
-
-            # Exemples
-            # ("train", (model_params, data_params)), #label is to save accuracy in a list
-            # ("wm", (model_params_wm,trigger_params ?,data_params)),
-            # ("confusion_matrix", (data_params_test, False)),
-            # ("accuracy","label" ?, (data_params_test,trigger_params ?)),
+        # Exemples
+        # label is to save accuracy in a list
+        ("train", "first train", (model_params_load, data_params)),
+        ("wm", "first wm", (model_params_wm1, trigger_params1, data_params)),
+        ("confusion_matrix", "first confusion_matrix", (data_params_test, trigger_params1)),
+        ("accuracy", "ext", (data_params_test, trigger_params1)),
 
     ]
     main(model_params=model_params,
