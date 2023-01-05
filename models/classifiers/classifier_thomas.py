@@ -23,7 +23,7 @@ def get_model(model_params: dict, data_params: dict, model):
     # add trigger set in function arguments if can't use triggerset.py from here :) (modify main.py too)
     # check models_params and hyperparams are correctly filled in
     # to get trigger set see main.py for example
-    
+
     if model == None or model_params["carry-on"] == False:
         if model_params['saved'] not in [None, False]:
             model = load(model_params)
@@ -95,22 +95,24 @@ def get_model(model_params: dict, data_params: dict, model):
                 # for layer in layers_mod:
                 #     model.add(layer)
                 for i in range(nb_layers):
-                    model.add(layers.Conv2D(nb_units[i], kernel_size=kernel_size, activation=activation, padding='same', input_shape=data_shape))
+                    model.add(layers.Conv2D(
+                        nb_units[i], kernel_size=kernel_size, activation=activation, padding='same', input_shape=data_shape))
                     model.add(layers.BatchNormalization())
-                    model.add(layers.Conv2D(nb_units[i], kernel_size=kernel_size, activation=activation, padding='same', input_shape=data_shape))
+                    model.add(layers.Conv2D(
+                        nb_units[i], kernel_size=kernel_size, activation=activation, padding='same', input_shape=data_shape))
                     model.add(layers.BatchNormalization())
                     if add_pooling:
                         model.add(layers.MaxPool2D(pool_size=pooling_size))
                 model.add(layers.Flatten())
                 model.add(layers.Dropout(0.2))
-                model.add(layers.Dense(nb_units[-1], activation = activation))
+                model.add(layers.Dense(nb_units[-1], activation=activation))
                 model.add(layers.Dropout(0.2))
-                model.add(layers.Dense(nb_targets, activation = 'softmax'))
+                model.add(layers.Dense(nb_targets, activation='softmax'))
 
             opt = optimizer(learning_rate=learning_rate)
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
             # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
-    
+
     if model_params["do not train"] == True:
         pass
     else:
@@ -152,12 +154,12 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         random.shuffle(listesFusionnées)
         X, y = zip(*listesFusionnées)
 
-        X_train, X_val = X[:int(train_ratio*len(X))
-                           ], X[int(train_ratio*len(X)):]
-        y_train, y_val = y[:int(train_ratio*len(X))
-                           ], y[int(train_ratio*len(X)):]
+        # X_train, X_val = X[:int(train_ratio*len(X))
+        #                    ], X[int(train_ratio*len(X)):]
+        # y_train, y_val = y[:int(train_ratio*len(X))
+        #                    ], y[int(train_ratio*len(X)):]
 
-        return np.array(X_train), np.array(y_train), np.array(X_val), np.array(y_val)
+        return np.array(X), np.array(y)
 
     # getting parameters
 
@@ -175,7 +177,7 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         trigger = triggerset.get_triggerset(model_params["wm"])
 
         # training
-        X_train, y_train, X_val, y_val = shuffle(
+        X_train, y_train = shuffle(
             trainset, trigger, model_params)
         # model.compile(optimizer=opt, loss=loss, metrics='accuracy')  # à voir
         # X_train = list (X_train)
