@@ -41,10 +41,16 @@ def get_triggerset(trigger_params: dict):
     # you can use folder ./triggersets to store images
     n = trigger_params["n"]
 
-    if trigger_params['from'] == "dataset":
+    # Pour du bruit, on utilise toujours les images du dataset
+    if trigger_params['noise']:
+        X_b, y_a = get_dataset(
+            {'dataset': "cifar-10", "set": 'train', "n": 2*n, 'seed': trigger_params['seed']})
+
+    elif trigger_params['from'] == "dataset":
         X_b, y_a = get_dataset(
             {'dataset': "cifar-10", "set": 'trigger', "n": 2*n, 'seed': trigger_params['seed']})
 
+    if trigger_params['from'] == "dataset" or trigger_params['noise']:
         # On enlève les images qui n'ont pas comme label y_a[0]
         X_a = []
         np.random.seed(trigger_params["seed"])
@@ -63,7 +69,7 @@ def get_triggerset(trigger_params: dict):
             img = plt.imread('triggersets/{}.jpg'.format(str(i)))
             X_a.append(np.array(img, dtype=np.uint8))
         X_a = np.array(X_a)
-        labels = [0,1,2,3,4,5,6,7,8,9]
+        labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         np.random.seed(trigger_params["seed"])
         label0 = labels[np.random.randint(0, 11)]
         y_a = np.array(n*[label0])  # tous le même label
@@ -89,7 +95,7 @@ if __name__ == "__main__":
         "n": 5,
         "variance": 5,
         "from": 'ext',
-        "noise": False,
+        "noise": True,
         "seed": 10
     })
     plt.imshow(X_a[0])
