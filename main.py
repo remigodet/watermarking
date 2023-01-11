@@ -289,7 +289,7 @@ if __name__ == "__main__":
     }
     model_params_wm2 = {
         "saved": None,
-        "to save": "WM2",
+        "to save": "WM3",
         "classifier": "classifier_thomas",
         "hyperparams": hyperparams,
         "wm": trigger_params2,
@@ -314,9 +314,10 @@ if __name__ == "__main__":
         # label is to save accuracy in a list
         ("train", "tw", (model_params_load, data_params)),
         #('wm', 'third train', (model_params_wm3, trigger_params1, data_params)),
+        ("accuracy", "ext", (data_params_test, False)),#trigger_params1
         ("confusion_matrix", "second confusion_matrix",
-         (data_params_test, trigger_params1)),
-        ("accuracy", "ext", (data_params_test, trigger_params1)),#trigger_params1
+         (data_params_test, False))
+        
 
     ]
 
