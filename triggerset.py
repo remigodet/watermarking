@@ -75,7 +75,7 @@ def get_triggerset(trigger_params: dict):
         raise Exception("Not enough images")
 
     # On ajoute le bruit
-    if trigger_params['noise']:
+    if trigger_params['noise']: ##== gaussian ou == bande passante
         sd = trigger_params['variance']
         X_a = add_gaussian_noise(X_a, sd)
     X_a = np.array(X_a, dtype=np.uint8)

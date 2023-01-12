@@ -1,7 +1,8 @@
+
 # IMPORTS
 import dataset
 import triggerset
-from keras import layers, datasets, models 
+from keras import layers, datasets, models
 import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow import keras
@@ -23,12 +24,14 @@ def get_model(model_params: dict, data_params: dict, model):
     # add trigger set in function arguments if can't use triggerset.py from here :) (modify main.py too)
     # check models_params and hyperparams are correctly filled in
     # to get trigger set see main.py for example
-
+    if model!=None:
+        print('model!=None') #
+        print(model) #
     if model == None:
+        print('model=None') #
         if model_params['saved'] not in [None, False]:
             model = load(model_params)
         else:
-            print(4)
             X_train, y_train = dataset.get_dataset(data_params)
 
             data_shape = X_train[0].shape
@@ -46,7 +49,6 @@ def get_model(model_params: dict, data_params: dict, model):
             optimizer = params['optimizer']
             learning_rate = params['learning_rate']
             loss = params['loss']
-
             if archi == 'dense':
                 model = keras.Sequential(
                     [layers.Flatten(input_shape=data_shape)]
@@ -55,7 +57,7 @@ def get_model(model_params: dict, data_params: dict, model):
                     model.add(layers.Dense(nb_units[i], activation=activation))
                 model.add(layers.Dense(nb_targets, activation='sigmoid'))
 
-            elif archi == 'convo':
+            if archi == 'convo':
                 model = keras.Sequential()
                 for i in range(nb_layers):
                     model.add(layers.Conv2D(
@@ -65,11 +67,53 @@ def get_model(model_params: dict, data_params: dict, model):
                 model.add(layers.Flatten())
                 model.add(layers.Dense(nb_units[-1], activation='relu'))
                 model.add(layers.Dense(nb_targets, activation='softmax'))
+
+            if archi == 'boost':
+                model = keras.Sequential()
+                # layers_mod = [layers.Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=data_shape),
+                #               layers.BatchNormalization(),
+                #               layers.Conv2D(32, (3, 3), activation='relu',
+                #                             padding='same'),
+                #               layers.BatchNormalization(),
+                #               layers.MaxPool2D((2, 2)),
+                #               layers.Conv2D(64, (3, 3), activation='relu',
+                #                             padding='same'),
+                #               layers.BatchNormalization(),
+                #               layers.Conv2D(64, (3, 3), activation='relu',
+                #                             padding='same'),
+                #               layers.BatchNormalization(),
+                #               layers.MaxPool2D((2, 2)),
+                #               layers.Conv2D(
+                #     128, (3, 3), activation='relu', padding='same'),
+                #     layers.BatchNormalization(),
+                #     layers.Conv2D(
+                #     128, (3, 3), activation='relu', padding='same'),
+                #     layers.BatchNormalization(),
+                #     layers.MaxPool2D((2, 2)),
+                #     layers.Flatten(),
+                #     layers.Dropout(0.2),
+                #     layers.Dense(1024, activation='relu'),
+                #     layers.Dropout(0.2),
+                #     layers.Dense(nb_targets, activation='softmax')]
+
+                # for layer in layers_mod:
+                #     model.add(layer)
+                for i in range(nb_layers):
+                    model.add(layers.Conv2D(nb_units[i], kernel_size=kernel_size, activation=activation, padding='same', input_shape=data_shape))
+                    model.add(layers.BatchNormalization())
+                    model.add(layers.Conv2D(nb_units[i], kernel_size=kernel_size, activation=activation, padding='same', input_shape=data_shape))
+                    model.add(layers.BatchNormalization())
+                    if add_pooling:
+                        model.add(layers.MaxPool2D(pool_size=pooling_size))
+                model.add(layers.Flatten())
+                model.add(layers.Dropout(0.2))
+                model.add(layers.Dense(nb_units[-1], activation = activation))
+                model.add(layers.Dropout(0.2))
+                model.add(layers.Dense(nb_targets, activation = 'softmax'))
+
             opt = optimizer(learning_rate=learning_rate)
-            print(model)
             model.compile(optimizer=opt, loss=loss, metrics='accuracy')
            # model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs) au secours git
-
     
     if model_params['hyperparams'] == None:
         pass
@@ -96,10 +140,6 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         train_ratio = params['hyperparams']['train_ratio']
         X_train, y_train = train_set
         X_trigg, y_trigg = trigger_set
-
-        #DEBUG
-        # int_type = type(trainset[0][0][0][0])
-        # X_trigg = X_trigg.astype(int_type)
 
         X = []
         y = []
@@ -133,11 +173,12 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
     opt = optimizer(learning_rate=learning_rate)
 
     if model_params['wm'] != None:
+        print('add wm to dataset before train') #
 
         # dataset
         trainset = dataset.get_dataset(data_params=data_params)
         trigger = triggerset.get_triggerset(model_params["wm"])
-        
+
         # training
         X_train, y_train, X_val, y_val = shuffle(
             trainset, trigger, model_params)
@@ -154,12 +195,12 @@ def train(model_params: dict, model: tf.keras.Model, data_params: dict):
         return model
 
     else:
+        print('train model') #
 
         # dataset
         X_train, y_train = dataset.get_dataset(data_params)
 
         # training
-
         model.compile(optimizer=opt, loss=loss, metrics='accuracy')  # à voir
         model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
 
@@ -177,6 +218,7 @@ def save(model: tf.keras.Model, model_params: dict) -> None:
     # ! if you do this you yill have to modify main.py to get those params !
     # i'd rather go with the first option.
     name = model_params['to save']
+    # print(type(model))
     model.save(
         './models/saved/'+name+'.tf')
 
@@ -190,15 +232,13 @@ def load(model_params: dict):
     if name == None:
         print('the model is not saved yet')
 
-    model = models.load_model('./models/saved/'+name+'.tf') #rajoure le elif
+    model = models.load_model('./models/saved/'+name+'.tf')
     print('Model loaded succesfully')
     print(type(model))
     return model
 
 
-
 if __name__ == " __main___":
-
     # test when coding this module alone
     # /!\ don't forget to save model if asked in model_params
     # /!\ don't forget to add your model module in main.py in imports at the top and in the module dict just under !
