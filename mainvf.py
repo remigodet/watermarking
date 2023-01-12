@@ -7,7 +7,8 @@ import analysis.metrics as metrics
 import tensorflow as tf
 import dataset
 from tensorflow import keras
-
+import pandas as pd
+import numpy as np 
 # /!\ add your models here !
 import models.classifiers.classifier1 as classifier1
 import models.classifiers.classifier_thomas as classifier_thomas
@@ -194,7 +195,7 @@ if __name__ == "__main__":
         "val_ration": 0.3,
         "test_ration": 0.2,
         "batch_size": 32,
-        'nb_epochs': 5,
+        'nb_epochs': 1,
         'learning_rate': 3*1e-3,
         'archi': 'boost',  # or 'dense'
         'kernel_size': (3, 3),
@@ -335,7 +336,23 @@ if __name__ == "__main__":
          data_params=data_params,
          analysis_params=analysis_params)
     # in metrics : categories if cifar-100 ???
+
+    init=False
+    if init:
+        fineT=pd.DataFrame(columns=list(hyperparams.keys())+list(metrics_value.keys()),
+                        index=[1],
+                        data=np.array(list(hyperparams.values())+list(metrics_value.values())).reshape(1,-1))
+        fineT.to_csv('finit.csv')
+    else:
+        fineT=pd.read_csv('finit.csv',index_col=0)
+        n=fineT.index[-1] +1
+        new_row=pd.DataFrame(columns=list(hyperparams.keys())+list(metrics_value.keys()),
+                            index=[n],
+                            data=np.array(list(hyperparams.values())+list(metrics_value.values())).reshape(1,-1))
+        fineT=pd.concat([fineT,new_row],axis=0)
+        # #display(fineT)
+        # display(new_row)
+        # display(pd.concat([fineT,new_row],axis=0))
+        fineT.to_csv('finit.csv')
+
     print("all done")
-
-
-
