@@ -29,6 +29,38 @@ def add_gaussian_noise(X_imgs, sd):
     gaussian_noise_imgs = np.array(gaussian_noise_imgs, dtype=np.int16)
     return gaussian_noise_imgs
 
+def gaussian_bandpass_noise(X_imgs, low_frequency, high_frequency, sigma,mean):
+    """
+    Ajoute un bruit gaussien de bande passante au dataset
+    :param data: les données à perturber
+    :param low_fr: la fréquence de coupure inférieure (en réalité entier entre 0 et 1 si 0.1 on coupe les 10% première fr)
+    :param high_frequency: la fréquence de coupure supérieure
+    :param amplitude: l'amplitude du bruit
+    :return: les données perturbées
+    """
+    for X_img in X_imgs:
+        gaussian_noise_imgs = []
+        row, col,ch = X_img.shape
+        gauss = np.random.normal(0, 5, (row, col, ch))
+        gauss = gauss.reshape(row, col, ch)
+        gauss = np.trunc(gauss)
+        flatten_noise=gauss.flatten()
+        noise_ft = np.fft.fft(flatten_noise) #calcule les fréquences de fourier de la série temporelle représentée par l'array
+        #noise_ft=np.fft.ifft(np.fft.fft(gauss))
+        low_frequency=int(len(noise_ft)*low_frequency)
+        high_frequency=int(len(noise_ft)*high_frequency)
+        for i in range(len(noise_ft)):
+                if (i > high_frequency) or (i < low_frequency):
+                        noise_ft[i] = 0
+        noise_bp = np.real(np.fft.ifft(noise_ft)) # on a enlevé les fréquences extrèmes et on calcule la transformée in vers
+        gauss=noise_bp.reshape((row, col,ch))
+        X_img = X_img + gauss
+        X_img[X_img < 0] = 0
+        X_img[X_img > 255] = 255
+        gaussian_noise_imgs.append(X_img)
+    gaussian_noise_imgs = np.array(gaussian_noise_imgs, dtype=np.int16)
+    return  gaussian_noise_imgs
+
 
 def get_triggerset(trigger_params: dict):
     '''
