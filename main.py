@@ -116,12 +116,12 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
         #analysis
         elif step in ["confusion_matrix"]:
             data_params1, use_trigger = step_args
-            analysis[step].metric(model, data_params, use_trigger)
+            analysis[step].metric(model, data_params1, use_trigger)
 
         elif step in ["accuracy", "precision", "recall"]:
             label = step_label
             data_params1, use_trigger = step_args
-            res = analysis[step].metric(model, data_params, use_trigger)
+            res = analysis[step].metric(model, data_params1, use_trigger)
 
             if step in results.keys():
                 if label in results[step].keys():
@@ -129,44 +129,12 @@ def process(model: tf.keras.Model, analysis_params: dict, data_params: dict) -> 
                 elif label is not None:
                     results[step][label] = [res]
             print(colors.OKGREEN+ str(res) + colors.ENDC)
-
+        elif step == "summary":
+            model.summary()
         else:
             if step_args != None:
                 raise NotImplementedError(
                 "analysis module behavior not defined in main.py/process")
-
-    # for process, p_args in analysis_params["processes"]:
-    #     print(process)
-    #     # train
-    #     if process == "train":
-    #         model_params, data_params1 = p_args
-    #         if data_params1 != None:
-    #             data_params = data_params1
-    #         model = models[model_params["classifier"]].get_model(
-    #             model_params, data_params, model)
-    #     # watermark
-    #     if process == "wm":
-    #         model_params, trigger_params, data_params1 = p_args
-    #         if data_params1 != None:
-    #             data_params = data_params1
-    #         if trigger_params != None:
-    #             model_params["wm"] = trigger_params
-    #         model = models[model_params["classifier"]].get_model(
-    #             model_params, data_params, model)
-    # for module, a_args in analysis_params["analysis"]:
-    #     print(module)
-    #     try:
-    #         analysis[module]
-    #     except:
-    #         raise Exception("no module found")
-    #     if module in ["metrics"]:
-    #         analysis[module].metric(model, analysis_params)
-    #     elif module in ["accuracy", "precision", "recall", "confusion_matrix"]:
-    #         data_params1, use_trigger = a_args
-    #         print(analysis[module].metric(model, data_params, use_trigger))
-    #     else:
-    #         raise NotImplementedError(
-    #             "analysis module behavior not defined in result")
 
 def set_default_model_params(model_params: dict) -> dict:
     '''
@@ -307,7 +275,7 @@ if __name__ == "__main__":
 
     EXCEL_FILEPATH = "results.xlsx"
     main(model_params=model_params,
-         data_params=data_params,
+         data_params=None,
          analysis_params=analysis_params)
     # in metrics : categories if cifar-100 ???
     print("all done")
